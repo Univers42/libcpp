@@ -83,6 +83,8 @@ class TermWriter {
         TermWriter& warn(const std::string& msg);
         TermWriter& error(const std::string& msg);
         TermWriter& success(const std::string& msg);
+        TermWriter& danger(const std::string& msg);
+        TermWriter& trace(const std::string& msg);
         TermWriter& bullet(const std::string& msg);
         TermWriter& ordered(int num, const std::string& msg);
         TermWriter& sep();

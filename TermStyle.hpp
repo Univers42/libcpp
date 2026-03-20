@@ -38,6 +38,8 @@ namespace Glyph {
     static const char WARN[]      = "\xe2\x9a\xa0  "; // ⚠  
     static const char CROSS[]     = "\xe2\x9c\x97 ";  // ✗ 
     static const char CHECK[]     = "\xe2\x9c\x94 ";  // ✔ 
+    static const char SKULL[]     = "\xe2\x98\xa0  "; // ☠  (danger / destructor)
+    static const char CHAIN[]     = "\xe2\x97\x87 ";  // ◇  (trace / copy)
 
     // ── box drawing (quote bar) ───────────────────────────
     static const char VBAR[]      = "\xe2\x94\x83 ";  // ┃ 
@@ -106,6 +108,8 @@ class TermStyle {
         ElemStyle _warnSt;
         ElemStyle _errorSt;
         ElemStyle _successSt;
+        ElemStyle _dangerSt;
+        ElemStyle _traceSt;
         ElemStyle _quoteSt;
         ElemStyle _sepSt;
         ElemStyle _calloutSt;
@@ -125,6 +129,8 @@ class TermStyle {
         ElemStyle& warnStyle();
         ElemStyle& errorStyle();
         ElemStyle& successStyle();
+        ElemStyle& dangerStyle();
+        ElemStyle& traceStyle();
         ElemStyle& quoteStyle();
         ElemStyle& sepStyle();
         ElemStyle& calloutStyle();
@@ -167,6 +173,8 @@ class TermStyle {
         std::string warn(const std::string& msg) const;
         std::string error(const std::string& msg) const;
         std::string success(const std::string& msg) const;
+        std::string danger(const std::string& msg) const;
+        std::string trace(const std::string& msg) const;
 
         /* ── list items ────────────────────────────────── */
         std::string bullet(const std::string& msg) const;

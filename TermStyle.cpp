@@ -34,9 +34,11 @@ TermStyle::TermStyle()
       _warnSt   (Srgb(255, 200,   0), Srgb(  0,   0,   0), Srgb(180, 140,   0), BOLD | ITALIC,         LEFT,   60, 1, 1, 0, 0, 0, 0, false, Glyph::WARN,       Glyph::HDASH),
       _errorSt  (Srgb(255,  60,  60), Srgb(  0,   0,   0), Srgb(200,  40,  40), BOLD | UNDERLINE,      LEFT,   60, 1, 1, 0, 0, 0, 0, false, Glyph::CROSS,      Glyph::HDASH),
       _successSt(Srgb(  0, 230, 120), Srgb(  0,   0,   0), Srgb(  0, 160,  80), BOLD,                  LEFT,   60, 1, 1, 0, 0, 0, 0, false, Glyph::CHECK,      Glyph::HDASH),
+      _dangerSt (Srgb(255,  80,  80), Srgb(  0,   0,   0), Srgb(180,  40,  40), BOLD,                  LEFT,   60, 1, 1, 0, 0, 0, 0, false, Glyph::SKULL,      Glyph::HDASH),
+      _traceSt  (Srgb(180, 130, 255), Srgb(  0,   0,   0), Srgb(120,  80, 180), DIM | ITALIC,          LEFT,   60, 1, 1, 0, 0, 0, 0, false, Glyph::CHAIN,      Glyph::HDASH),
       _quoteSt  (Srgb(180, 180, 180), Srgb(  0,   0,   0), Srgb(100, 100, 100), ITALIC,                LEFT,   60, 3, 1, 0, 0, 0, 0, false, Glyph::VBAR,       Glyph::HDASH),
       _sepSt    (Srgb(100, 100, 100), Srgb(  0,   0,   0), Srgb(100, 100, 100), DIM,                   LEFT,   60, 0, 0, 0, 0, 0, 0, false, "",                 Glyph::HDASH),
-      _calloutSt(Srgb(180, 200, 220), Srgb( 20,  30,  45), Srgb( 60,  80, 110), NONE,                  LEFT,   60, 3, 2, 0, 1, 0, 0, true,  Glyph::VBAR_THIN,  Glyph::HDASH),
+      _calloutSt(Srgb(180, 200, 220), Srgb( 20,  30,  45), Srgb( 60,  80, 110), NONE,                  LEFT,   60, 3, 3, 0, 1, 0, 1, true,  Glyph::VBAR_THIN,  Glyph::HDASH),
       _bulletSt (Srgb(200, 210, 220), Srgb(  0,   0,   0), Srgb(128, 128, 128), NONE,                  LEFT,   60, 3, 1, 0, 0, 0, 0, false, Glyph::BULLET,     Glyph::HDASH),
       _olSt     (Srgb(200, 210, 220), Srgb(  0,   0,   0), Srgb(128, 128, 128), NONE,                  LEFT,   60, 3, 1, 0, 0, 0, 0, false, "",                 Glyph::HDASH)
 {}
@@ -55,6 +57,8 @@ TermStyle::ElemStyle& TermStyle::infoStyle()    { return _infoSt; }
 TermStyle::ElemStyle& TermStyle::warnStyle()    { return _warnSt; }
 TermStyle::ElemStyle& TermStyle::errorStyle()   { return _errorSt; }
 TermStyle::ElemStyle& TermStyle::successStyle() { return _successSt; }
+TermStyle::ElemStyle& TermStyle::dangerStyle()  { return _dangerSt; }
+TermStyle::ElemStyle& TermStyle::traceStyle()   { return _traceSt; }
 TermStyle::ElemStyle& TermStyle::quoteStyle()   { return _quoteSt; }
 TermStyle::ElemStyle& TermStyle::sepStyle()     { return _sepSt; }
 TermStyle::ElemStyle& TermStyle::calloutStyle()  { return _calloutSt; }
@@ -286,6 +290,14 @@ std::string TermStyle::success(const std::string& msg) const {
     return renderLine(_successSt, msg);
 }
 
+std::string TermStyle::danger(const std::string& msg) const {
+    return renderLine(_dangerSt, msg);
+}
+
+std::string TermStyle::trace(const std::string& msg) const {
+    return renderLine(_traceSt, msg);
+}
+
 /* ═══════════════════════════════════════════════════════════
  *  List items
  * ═══════════════════════════════════════════════════════════ */
@@ -328,50 +340,81 @@ std::string TermStyle::callout(const std::string& label,
         if (!lines[i]->empty()) lineCount = i + 1;
     }
 
-    std::string r;
-    int w = _calloutSt.width > 0 ? _calloutSt.width : 60;
-    int innerW = w - _calloutSt.padL - _calloutSt.padR;
-    if (innerW < 1) innerW = 1;
-
-    r += TermUtils::newlines(_calloutSt.spaceBefore);
-
-    // header line (bold label)
-    std::string hdr;
-    hdr += TermUtils::spaces(_calloutSt.marginL);
-    if (_calloutSt.hasBg) hdr += TermUtils::applyBg(_calloutSt.bg);
-    hdr += TermUtils::applyFg(_calloutSt.border);
-    hdr += TermUtils::applyFont(BOLD);
-    hdr += TermUtils::spaces(_calloutSt.padL);
-    hdr += _calloutSt.glyph;
-    std::string hText = alignText(label, innerW - TermUtils::visLen(_calloutSt.glyph), _calloutSt.align);
-    hdr += hText;
-    hdr += TermUtils::spaces(_calloutSt.padR);
-    hdr += TermUtils::reset();
-    r += hdr + "\n";
-
-    // body lines (dimmer, with border bar — not the header glyph)
+    int glyphLen  = TermUtils::visLen(_calloutSt.glyph);
     std::string bGlyph = _calloutSt.bodyGlyph.empty()
         ? _calloutSt.glyph : _calloutSt.bodyGlyph;
     int bGlyphLen = TermUtils::visLen(bGlyph);
+
+    /* ── Pass 1: measure max content width ────────────── */
+    int maxContent = 0;
+
+    /* header: glyph + label */
+    int hdrW = glyphLen + TermUtils::visLen(label);
+    if (hdrW > maxContent) maxContent = hdrW;
+
+    /* body lines: bodyGlyph + text */
     for (int i = 0; i < lineCount; ++i) {
         if (lines[i]->empty()) continue;
-        std::string ln;
-        ln += TermUtils::spaces(_calloutSt.marginL);
-        if (_calloutSt.hasBg) ln += TermUtils::applyBg(_calloutSt.bg);
-        ln += TermUtils::applyFg(_calloutSt.fg);
-        ln += TermUtils::applyFont(_calloutSt.font);
-        ln += TermUtils::spaces(_calloutSt.padL);
-        ln += bGlyph;
-        std::string bText = alignText(*lines[i], innerW - bGlyphLen, _calloutSt.align);
-        ln += bText;
-        ln += TermUtils::spaces(_calloutSt.padR);
-        ln += TermUtils::reset();
-        r += ln + "\n";
+        int lw = bGlyphLen + TermUtils::visLen(*lines[i]);
+        if (lw > maxContent) maxContent = lw;
     }
 
-    // bottom bg blank line to close the box
+    /* effective box width = max(configured, content needs) */
+    int minW = _calloutSt.width > 0 ? _calloutSt.width : 60;
+    int innerW = maxContent;
+    if (innerW < minW - _calloutSt.padL - _calloutSt.padR)
+        innerW = minW - _calloutSt.padL - _calloutSt.padR;
+    int w = innerW + _calloutSt.padL + _calloutSt.padR;
+
+    /* ── Pass 2: render ───────────────────────────────── */
+    std::string r;
+    std::string sp  = TermUtils::spaces(_calloutSt.marginL);
+    std::string plS = TermUtils::spaces(_calloutSt.padL);
+    std::string prS = TermUtils::spaces(_calloutSt.padR);
+    std::string rst = TermUtils::reset();
+
+    r += TermUtils::newlines(_calloutSt.spaceBefore);
+
+    // top bg blank
     if (_calloutSt.hasBg)
-        r += renderBgBlank(_calloutSt);
+        r += sp + TermUtils::applyBg(_calloutSt.bg)
+           + TermUtils::spaces(w) + rst + "\n";
+
+    // header line (bold label)
+    {
+        r += sp;
+        if (_calloutSt.hasBg) r += TermUtils::applyBg(_calloutSt.bg);
+        r += TermUtils::applyFg(_calloutSt.border);
+        r += TermUtils::applyFont(BOLD);
+        r += plS + _calloutSt.glyph;
+
+        std::string txt = label;
+        int avail = innerW - glyphLen;
+        int tLen  = TermUtils::visLen(txt);
+        if (tLen < avail) txt += std::string(avail - tLen, ' ');
+        r += txt + prS + rst + "\n";
+    }
+
+    // body lines
+    for (int i = 0; i < lineCount; ++i) {
+        if (lines[i]->empty()) continue;
+        r += sp;
+        if (_calloutSt.hasBg) r += TermUtils::applyBg(_calloutSt.bg);
+        r += TermUtils::applyFg(_calloutSt.fg);
+        r += TermUtils::applyFont(_calloutSt.font);
+        r += plS + bGlyph;
+
+        std::string txt = *lines[i];
+        int avail = innerW - bGlyphLen;
+        int tLen  = TermUtils::visLen(txt);
+        if (tLen < avail) txt += std::string(avail - tLen, ' ');
+        r += txt + prS + rst + "\n";
+    }
+
+    // bottom bg blank
+    if (_calloutSt.hasBg)
+        r += sp + TermUtils::applyBg(_calloutSt.bg)
+           + TermUtils::spaces(w) + rst + "\n";
 
     r += TermUtils::newlines(_calloutSt.spaceAfter);
     return r;

@@ -70,75 +70,94 @@ std::string TermWriter::_renderCallout(
         const std::string& label,
         const std::string* lines,
         int count) const {
-    /* We reuse TermStyle's private rendering helpers indirectly
-     * by building the callout manually — same algorithm as
-     * TermStyle::callout() but with a caller-chosen ElemStyle. */
+    /*
+     * Two-pass callout renderer:
+     *   Pass 1 — measure the visual width of every content line
+     *            (header label + each body line, including glyph).
+     *            Compute maxW = max of all, then effective box width
+     *            = max(es.width, maxW + padL + padR).
+     *   Pass 2 — render every line, padding each to the effective
+     *            box width so the background fills uniformly.
+     */
+
+    int glyphLen  = TermUtils::visLen(es.glyph);
+    std::string bGlyph = es.bodyGlyph.empty() ? es.glyph : es.bodyGlyph;
+    int bGlyphLen = TermUtils::visLen(bGlyph);
+
+    /* ── Pass 1: measure ──────────────────────────────── */
+    int maxContent = 0;                       /* widest content (glyph + text) */
+
+    /* header: glyph + label */
+    int hdrW = glyphLen + TermUtils::visLen(label);
+    if (hdrW > maxContent) maxContent = hdrW;
+
+    /* body lines: bodyGlyph + text */
+    for (int i = 0; i < count; ++i) {
+        if (lines[i].empty()) continue;
+        int lw = bGlyphLen + TermUtils::visLen(lines[i]);
+        if (lw > maxContent) maxContent = lw;
+    }
+
+    /* effective box width = max(configured, needed) */
+    int minW = es.width > 0 ? es.width : 60;
+    int innerW = maxContent;
+    if (innerW < minW - es.padL - es.padR)
+        innerW = minW - es.padL - es.padR;
+    int w = innerW + es.padL + es.padR;
+
+    /* ── Pass 2: render ───────────────────────────────── */
     std::string r;
-    int w = es.width > 0 ? es.width : 60;
-    int innerW = w - es.padL - es.padR;
-    if (innerW < 1) innerW = 1;
-    int glyphLen = TermUtils::visLen(es.glyph);
-
-    /* spaceBefore */
-    r += TermUtils::newlines(es.spaceBefore);
-
-    /* header line */
     std::string sp  = TermUtils::spaces(es.marginL);
     std::string plS = TermUtils::spaces(es.padL);
     std::string prS = TermUtils::spaces(es.padR);
     std::string rst = TermUtils::reset();
 
-    r += sp;
-    if (es.hasBg) r += TermUtils::applyBg(es.bg);
-    r += TermUtils::applyFg(es.border);
-    r += TermUtils::applyFont(TermUtils::BOLD);
-    r += plS;
-    r += es.glyph;
+    r += TermUtils::newlines(es.spaceBefore);
+
+    /* top bg blank — opening bar */
+    if (es.hasBg) {
+        r += sp + TermUtils::applyBg(es.bg)
+           + TermUtils::spaces(w) + rst + "\n";
+    }
+
+    /* header line (bold, border color) */
     {
+        r += sp;
+        if (es.hasBg) r += TermUtils::applyBg(es.bg);
+        r += TermUtils::applyFg(es.border);
+        r += TermUtils::applyFont(TermUtils::BOLD);
+        r += plS + es.glyph;
+
         std::string txt = label;
         int avail = innerW - glyphLen;
-        int tLen = TermUtils::visLen(txt);
+        int tLen  = TermUtils::visLen(txt);
         if (tLen < avail) txt += std::string(avail - tLen, ' ');
-        r += txt;
+        r += txt + prS + rst + "\n";
     }
-    r += prS;
-    r += rst;
-    r += "\n";
 
-    /* body lines — use bodyGlyph (border bar), not the header glyph */
-    std::string bGlyph = es.bodyGlyph.empty() ? es.glyph : es.bodyGlyph;
-    int bGlyphLen = TermUtils::visLen(bGlyph);
+    /* body lines (fg color, body glyph) */
     for (int i = 0; i < count; ++i) {
         if (lines[i].empty()) continue;
         r += sp;
         if (es.hasBg) r += TermUtils::applyBg(es.bg);
         r += TermUtils::applyFg(es.fg);
         r += TermUtils::applyFont(es.font);
-        r += plS;
-        r += bGlyph;
-        {
-            std::string txt = lines[i];
-            int avail = innerW - bGlyphLen;
-            int tLen = TermUtils::visLen(txt);
-            if (tLen < avail) txt += std::string(avail - tLen, ' ');
-            r += txt;
-        }
-        r += prS;
-        r += rst;
-        r += "\n";
+        r += plS + bGlyph;
+
+        std::string txt = lines[i];
+        int avail = innerW - bGlyphLen;
+        int tLen  = TermUtils::visLen(txt);
+        if (tLen < avail) txt += std::string(avail - tLen, ' ');
+        r += txt + prS + rst + "\n";
     }
 
-    /* bottom bg blank */
+    /* bottom bg blank — closing bar */
     if (es.hasBg) {
-        r += sp;
-        r += TermUtils::applyBg(es.bg);
-        r += TermUtils::spaces(w);
-        r += rst;
+        r += sp + TermUtils::applyBg(es.bg)
+           + TermUtils::spaces(w) + rst + "\n";
     }
 
-    /* spaceAfter */
     r += TermUtils::newlines(es.spaceAfter);
-
     return r;
 }
 
@@ -187,6 +206,12 @@ TermWriter& TermWriter::error(const std::string& m) {
 }
 TermWriter& TermWriter::success(const std::string& m) {
     _emit(_ts.success(m)); return *this;
+}
+TermWriter& TermWriter::danger(const std::string& m) {
+    _emit(_ts.danger(m)); return *this;
+}
+TermWriter& TermWriter::trace(const std::string& m) {
+    _emit(_ts.trace(m)); return *this;
 }
 TermWriter& TermWriter::bullet(const std::string& m) {
     _emit(_ts.bullet(m)); return *this;
@@ -504,7 +529,7 @@ void TermWriter::_parseLine(const std::string& raw) {
         return;
     }
 
-    /* ── log levels: !i !w !x !v ──────────────────────── */
+    /* ── log levels: !i !w !x !v !d !t ──────────────────── */
     if (line.size() >= 3 && line[0] == '!') {
         char c = line[1];
         if (c == 'i' && line[2] == ' ') { info(stripPrefix(line, 3));    return; }
@@ -512,6 +537,8 @@ void TermWriter::_parseLine(const std::string& raw) {
         if (c == '!' && line[2] == ' ') { warn(stripPrefix(line, 3));    return; }
         if (c == 'x' && line[2] == ' ') { error(stripPrefix(line, 3));   return; }
         if (c == 'v' && line[2] == ' ') { success(stripPrefix(line, 3)); return; }
+        if (c == 'd' && line[2] == ' ') { danger(stripPrefix(line, 3));  return; }
+        if (c == 't' && line[2] == ' ') { trace(stripPrefix(line, 3));   return; }
     }
 
     /* ── unordered list: - item ────────────────────────── */
