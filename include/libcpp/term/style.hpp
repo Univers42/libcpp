@@ -159,6 +159,12 @@ ElemStyle section_style;
 ElemStyle callout_style;
 ElemStyle bullet_style;
 ElemStyle ol_style;
+ElemStyle bold_style;
+ElemStyle italic_style;
+ElemStyle underline_style;
+ElemStyle strike_style;
+ElemStyle dim_style;
+ElemStyle code_style;
 
 /* headings */
 std::string h1(const std::string& text) const;
@@ -172,6 +178,7 @@ std::string italic(const std::string& msg) const;
 std::string dim(const std::string& msg) const;
 std::string underline(const std::string& msg) const;
 std::string strike(const std::string& msg) const;
+std::string code(const std::string& msg) const;
 
 /* blocks */
 std::string quote(const std::string& msg) const;

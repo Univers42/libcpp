@@ -205,9 +205,9 @@ ElemStyle::~ElemStyle() {}
 TermStyle::TermStyle()
 :
 /*         fg                    bg                   border               font                  align        w  pL pR pV mL sB sA  bg?   glyph             sep */
-h1_style  (Srgb(255,255,255), Srgb( 50, 30, 80), Srgb(160,100,220), FONT_BOLD,                ALIGN_CENTER, 60, 3, 3, 1, 0, 1, 1, true,  Glyph::DIAMOND,   Glyph::DOUBLE),
-h2_style  (Srgb(130,200,255), Srgb(  0,  0,  0), Srgb( 70,130,200), FONT_BOLD,                ALIGN_LEFT,   60, 1, 1, 0, 0, 1, 0, false, Glyph::TRIANGLE,  Glyph::HDASH_HVY),
-h3_style  (Srgb(130,220,160), Srgb(  0,  0,  0), Srgb( 60,160, 90), FONT_BOLD,                ALIGN_LEFT,   60, 3, 1, 0, 0, 0, 0, false, Glyph::BULLET,    Glyph::DOTTED),
+h1_style  (Srgb(255,220,240), Srgb( 30, 15, 40), Srgb(200,100,180), FONT_BOLD,                ALIGN_CENTER, 60, 3, 3, 1, 0, 1, 1, true,  Glyph::DIAMOND,   Glyph::DOUBLE),
+h2_style  (Srgb(110,190,255), Srgb(  0,  0,  0), Srgb( 60,120,200), FONT_BOLD,                ALIGN_LEFT,   60, 1, 1, 0, 0, 1, 0, false, Glyph::TRIANGLE,  Glyph::HDASH_HVY),
+h3_style  (Srgb(120,220,160), Srgb(  0,  0,  0), Srgb( 50,140, 80), FONT_BOLD,                ALIGN_LEFT,   60, 1, 1, 0, 0, 1, 0, false, Glyph::BULLET,    Glyph::DOTTED),
 body_style(Srgb(200,200,210), Srgb(  0,  0,  0), Srgb(128,128,128), FONT_NONE,                ALIGN_LEFT,   60, 2, 1, 0, 0, 0, 0, false, "",               Glyph::HDASH),
 quote_style(Srgb(160,170,180),Srgb(  0,  0,  0), Srgb( 90, 90,100), FONT_ITALIC,              ALIGN_LEFT,   60, 1, 1, 0, 3, 0, 0, false, Glyph::VBAR,      Glyph::HDASH),
 info_style(Srgb( 80,200,255), Srgb(  0,  0,  0), Srgb( 60,120,160), FONT_NONE,                ALIGN_LEFT,   60, 1, 1, 0, 0, 0, 0, false, Glyph::INFO,      Glyph::HDASH),
@@ -220,7 +220,13 @@ sep_style (Srgb( 80, 80, 90), Srgb(  0,  0,  0), Srgb( 80, 80, 90), FONT_DIM,   
 section_style(Srgb(130,200,255),Srgb(0, 0,  0),  Srgb( 70,130,200), FONT_BOLD,                ALIGN_LEFT,   60, 1, 1, 0, 0, 0, 0, false, Glyph::TRIANGLE,  Glyph::HDASH_HVY),
 callout_style(Srgb(190,200,215),Srgb(20,25, 38), Srgb( 80,120,180), FONT_NONE,                ALIGN_LEFT,   60, 1, 1, 0, 1, 0, 0, true,  Glyph::INFO,      Glyph::HDASH),
 bullet_style(Srgb(190,200,210),Srgb( 0,  0,  0), Srgb(128,128,128), FONT_NONE,                ALIGN_LEFT,   60, 3, 1, 0, 0, 0, 0, false, Glyph::BULLET,    Glyph::HDASH),
-ol_style  (Srgb(190,200,210), Srgb(  0,  0,  0), Srgb(128,128,128), FONT_NONE,                ALIGN_LEFT,   60, 3, 1, 0, 0, 0, 0, false, "",               Glyph::HDASH)
+ol_style  (Srgb(190,200,210), Srgb(  0,  0,  0), Srgb(128,128,128), FONT_NONE,                ALIGN_LEFT,   60, 3, 1, 0, 0, 0, 0, false, "",               Glyph::HDASH),
+bold_style(Srgb(255,255,255), Srgb(  0,  0,  0), Srgb(128,128,128), FONT_BOLD,                ALIGN_LEFT,   60, 2, 1, 0, 0, 0, 0, false, "",               Glyph::HDASH),
+italic_style(Srgb(200,200,220),Srgb( 0,  0,  0), Srgb(128,128,128), FONT_ITALIC,              ALIGN_LEFT,   60, 2, 1, 0, 0, 0, 0, false, "",               Glyph::HDASH),
+underline_style(Srgb(200,200,220),Srgb(0,0,  0), Srgb(128,128,128), FONT_UNDERLINE,           ALIGN_LEFT,   60, 2, 1, 0, 0, 0, 0, false, "",               Glyph::HDASH),
+strike_style(Srgb(150,150,160),Srgb( 0,  0,  0), Srgb(128,128,128), FONT_STRIKE,              ALIGN_LEFT,   60, 2, 1, 0, 0, 0, 0, false, "",               Glyph::HDASH),
+dim_style (Srgb(140,140,150), Srgb(  0,  0,  0), Srgb(128,128,128), FONT_DIM,                 ALIGN_LEFT,   60, 2, 1, 0, 0, 0, 0, false, "",               Glyph::HDASH),
+code_style(Srgb(230,180,100), Srgb( 30, 30, 40), Srgb(128,128,128), FONT_NONE,                ALIGN_LEFT,   60, 2, 1, 0, 0, 0, 0, true,  "",               Glyph::HDASH)
 {}
 
 TermStyle::TermStyle(const TermStyle& o)
@@ -231,7 +237,10 @@ TermStyle::TermStyle(const TermStyle& o)
   danger_style(o.danger_style), trace_style(o.trace_style),
   sep_style(o.sep_style), section_style(o.section_style),
   callout_style(o.callout_style), bullet_style(o.bullet_style),
-  ol_style(o.ol_style) {}
+  ol_style(o.ol_style), bold_style(o.bold_style),
+  italic_style(o.italic_style), underline_style(o.underline_style),
+  strike_style(o.strike_style), dim_style(o.dim_style),
+  code_style(o.code_style) {}
 
 TermStyle& TermStyle::operator=(const TermStyle& o)
 {
@@ -244,7 +253,10 @@ error_style = o.error_style; success_style = o.success_style;
 danger_style = o.danger_style; trace_style = o.trace_style;
 sep_style = o.sep_style; section_style = o.section_style;
 callout_style = o.callout_style; bullet_style = o.bullet_style;
-ol_style = o.ol_style;
+ol_style = o.ol_style; bold_style = o.bold_style;
+italic_style = o.italic_style; underline_style = o.underline_style;
+strike_style = o.strike_style; dim_style = o.dim_style;
+code_style = o.code_style;
 }
 return *this;
 }
@@ -335,18 +347,78 @@ return r;
 std::string TermStyle::_render_heading(const ElemStyle& es, const std::string& title) const
 {
 std::string r;
-ElemStyle inner = es;
-inner.space_before = 0;
-inner.space_after  = 0;
+std::string rst = TermUtils::reset();
+int w = es.width > 0 ? es.width : 60;
 
 r += TermUtils::newlines(es.space_before);
-r += _render_sep(es) + "\n";
-for (int i = 0; i < es.pad_v; ++i)
-r += _render_bg_blank(es) + "\n";
-r += _render_line(inner, title) + "\n";
-for (int i = 0; i < es.pad_v; ++i)
-r += _render_bg_blank(es) + "\n";
-r += _render_sep(es);
+
+if (es.has_bg)
+{
+	/* ── Banner-style heading (H1) ─────────────────────────────
+	**
+	**  ╔══════════════════════════════════════════╗
+	**  ║                                          ║
+	**  ║        ◆  Title Text Here                ║
+	**  ║                                          ║
+	**  ╚══════════════════════════════════════════╝
+	*/
+	std::string border_fg = TermUtils::apply_fg(es.border);
+	std::string text_fg   = TermUtils::apply_fg(es.fg);
+	std::string bg_on     = TermUtils::apply_bg(es.bg);
+	std::string font_on   = TermUtils::apply_font(es.font);
+
+	/* corner + horizontal bar chars */
+	std::string tl = "\xe2\x95\x94";  /* ╔ */
+	std::string tr = "\xe2\x95\x97";  /* ╗ */
+	std::string bl = "\xe2\x95\x9a";  /* ╚ */
+	std::string br = "\xe2\x95\x9d";  /* ╝ */
+	std::string hz = "\xe2\x95\x90";  /* ═ */
+	std::string vl = "\xe2\x95\x91";  /* ║ */
+
+	std::string hz_line = TermUtils::rep_ch(hz, w - 2);
+
+	/* top border:  ╔═══════╗ */
+	r += border_fg + bg_on + tl + hz_line + tr + rst + "\n";
+
+	/* vertical padding */
+	for (int i = 0; i < es.pad_v; ++i)
+		r += border_fg + bg_on + vl + TermUtils::spaces(w - 2) + vl + rst + "\n";
+
+	/* content line:  ║  ◆ Title  ║ */
+	{
+		int inner_w = w - 2 - es.pad_l - es.pad_r;
+		if (inner_w < 1) inner_w = 1;
+		std::string content = es.glyph + title;
+		std::string aligned = _align_text(content, inner_w, es.align);
+
+		r += border_fg + bg_on + vl;
+		r += TermUtils::spaces(es.pad_l);
+		r += text_fg + font_on + aligned;
+		r += TermUtils::spaces(es.pad_r);
+		r += border_fg + vl + rst + "\n";
+	}
+
+	/* vertical padding */
+	for (int i = 0; i < es.pad_v; ++i)
+		r += border_fg + bg_on + vl + TermUtils::spaces(w - 2) + vl + rst + "\n";
+
+	/* bottom border:  ╚═══════╝ */
+	r += border_fg + bg_on + bl + hz_line + br + rst;
+}
+else
+{
+	/* ── Simple heading (H2/H3-fallback) ────────────────────── */
+	ElemStyle inner = es;
+	inner.space_before = 0;
+	inner.space_after  = 0;
+	r += _render_sep(es) + "\n";
+	for (int i = 0; i < es.pad_v; ++i)
+		r += _render_bg_blank(es) + "\n";
+	r += _render_line(inner, title) + "\n";
+	for (int i = 0; i < es.pad_v; ++i)
+		r += _render_bg_blank(es) + "\n";
+	r += _render_sep(es);
+}
 r += TermUtils::newlines(es.space_after);
 return r;
 }
@@ -365,18 +437,70 @@ std::string TermStyle::h1(const std::string& t) const { return _render_heading(h
 
 std::string TermStyle::h2(const std::string& t) const
 {
+/*
+** H2 — left accent bar + bold text + separator underline
+**
+**  ┃ ▸ Heading Title
+**  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+std::string rst = TermUtils::reset();
+std::string border_fg = TermUtils::apply_fg(h2_style.border);
+std::string text_fg   = TermUtils::apply_fg(h2_style.fg);
+std::string font_on   = TermUtils::apply_font(h2_style.font);
+int w = h2_style.width > 0 ? h2_style.width : 60;
+
+std::string bar     = "\xe2\x94\x83";   /* ┃ */
+std::string corner  = "\xe2\x94\x97";   /* ┗ */
+
 std::string r;
-ElemStyle inner = h2_style;
-inner.space_before = 0;
-inner.space_after  = 0;
 r += TermUtils::newlines(h2_style.space_before);
-r += _render_line(inner, t) + "\n";
-r += _render_sep(h2_style);
+
+/* text line: ┃ ▸ Title */
+r += border_fg + bar + rst;
+r += TermUtils::spaces(h2_style.pad_l);
+r += text_fg + font_on + h2_style.glyph + t + rst + "\n";
+
+/* underline: ┗━━━━━━━━━ */
+r += border_fg + corner;
+r += TermUtils::tile_sep(h2_style.sep_str, w - 1);
+r += rst;
+
 r += TermUtils::newlines(h2_style.space_after);
 return r;
 }
 
-std::string TermStyle::h3(const std::string& t) const { return _render_line(h3_style, t); }
+std::string TermStyle::h3(const std::string& t) const
+{
+/*
+** H3 — colored glyph + text + subtle dotted underline
+**
+**  ● Third Level Title
+**  ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+*/
+std::string rst = TermUtils::reset();
+std::string text_fg   = TermUtils::apply_fg(h3_style.fg);
+std::string border_fg = TermUtils::apply_fg(h3_style.border);
+std::string font_on   = TermUtils::apply_font(h3_style.font);
+int w = h3_style.width > 0 ? h3_style.width : 60;
+
+std::string r;
+r += TermUtils::newlines(h3_style.space_before);
+
+/* text line: ● Title */
+r += TermUtils::spaces(h3_style.pad_l);
+r += text_fg + font_on + h3_style.glyph + t + rst + "\n";
+
+/* dotted underline */
+if (!h3_style.sep_str.empty())
+{
+	r += TermUtils::spaces(h3_style.pad_l);
+	r += border_fg + TermUtils::apply_font(FONT_DIM);
+	r += TermUtils::tile_sep(h3_style.sep_str, w - h3_style.pad_l);
+	r += rst;
+}
+r += TermUtils::newlines(h3_style.space_after);
+return r;
+}
 
 /* ======================================================================
  *  Inline styles
@@ -384,40 +508,12 @@ std::string TermStyle::h3(const std::string& t) const { return _render_line(h3_s
 
 std::string TermStyle::text(const std::string& msg) const     { return _render_line(body_style, msg); }
 
-std::string TermStyle::bold(const std::string& msg) const
-{
-ElemStyle s = body_style;
-s.font = FONT_BOLD;
-return _render_line(s, msg);
-}
-
-std::string TermStyle::italic(const std::string& msg) const
-{
-ElemStyle s = body_style;
-s.font = FONT_ITALIC;
-return _render_line(s, msg);
-}
-
-std::string TermStyle::dim(const std::string& msg) const
-{
-ElemStyle s = body_style;
-s.font = FONT_DIM;
-return _render_line(s, msg);
-}
-
-std::string TermStyle::underline(const std::string& msg) const
-{
-ElemStyle s = body_style;
-s.font = FONT_UNDERLINE;
-return _render_line(s, msg);
-}
-
-std::string TermStyle::strike(const std::string& msg) const
-{
-ElemStyle s = body_style;
-s.font = FONT_STRIKE;
-return _render_line(s, msg);
-}
+std::string TermStyle::bold(const std::string& msg) const      { return _render_line(bold_style, msg); }
+std::string TermStyle::italic(const std::string& msg) const    { return _render_line(italic_style, msg); }
+std::string TermStyle::dim(const std::string& msg) const       { return _render_line(dim_style, msg); }
+std::string TermStyle::underline(const std::string& msg) const { return _render_line(underline_style, msg); }
+std::string TermStyle::strike(const std::string& msg) const    { return _render_line(strike_style, msg); }
+std::string TermStyle::code(const std::string& msg) const      { return _render_line(code_style, msg); }
 
 /* ======================================================================
  *  Blocks
@@ -468,7 +564,13 @@ std::string TermStyle::ordered(int num, const std::string& msg) const
 {
 ElemStyle tmp = ol_style;
 std::ostringstream oss;
-oss << num << ". ";
+if (!ol_style.body_glyph.empty())
+	oss << ol_style.body_glyph;
+oss << num;
+if (!ol_style.glyph.empty())
+	oss << ol_style.glyph;
+else
+	oss << ". ";
 tmp.glyph = oss.str();
 return _render_line(tmp, msg);
 }
@@ -488,18 +590,27 @@ int line_count = 0;
 for (int i = 0; i < 10; ++i)
 if (!lines[i]->empty()) line_count = i + 1;
 
-/*
-** Obsidian-style callout:
-**   ┃  ⚠  Title
-**   ┃     Body line
-*/
-int w = callout_style.width > 0 ? callout_style.width : 60;
-int content_w = w - 5; /* " ┃ " = 3 vis chars + margin */
-if (content_w < 10) content_w = 10;
+int gw = TermUtils::vis_len(callout_style.glyph);
+
+/* Phase 1: measure max content width across all lines */
+int header_vis = gw + TermUtils::vis_len(label);
+int max_content = header_vis;
+for (int i = 0; i < line_count; ++i)
+{
+	if (lines[i]->empty()) continue;
+	int lw = gw + TermUtils::vis_len(*lines[i]);
+	if (lw > max_content) max_content = lw;
+}
+
+int bar_vis = 3; /* " ┃ " */
+int min_w = callout_style.width > 0 ? callout_style.width : 60;
+int content_w = max_content;
+if (content_w + bar_vis + 1 < min_w)
+	content_w = min_w - bar_vis - 1;
+int total_w = bar_vis + content_w + 1;
 
 std::string rst = TermUtils::reset();
 std::string sp  = TermUtils::spaces(callout_style.margin_l);
-int gw = TermUtils::vis_len(callout_style.glyph);
 
 std::string r;
 r += TermUtils::newlines(callout_style.space_before);
@@ -509,7 +620,7 @@ if (callout_style.has_bg)
 {
 r += sp + TermUtils::apply_bg(callout_style.bg)
    + TermUtils::apply_fg(callout_style.border)
-   + std::string(" \xe2\x94\x83") + TermUtils::spaces(w - 2) + rst + "\n";
+   + std::string(" \xe2\x94\x83") + TermUtils::spaces(total_w - 2) + rst + "\n";
 }
 
 /* header */
@@ -520,11 +631,10 @@ r += std::string(" \xe2\x94\x83 ");
 r += TermUtils::apply_font(FONT_BOLD);
 r += callout_style.glyph + label;
 {
-int used = gw + TermUtils::vis_len(label);
-int pad = content_w - used;
+int pad = content_w - header_vis;
 if (pad > 0) r += TermUtils::spaces(pad);
 }
-r += rst + "\n";
+r += " " + rst + "\n";
 
 /* body */
 for (int i = 0; i < line_count; ++i)
@@ -540,7 +650,7 @@ r += TermUtils::spaces(gw) + *lines[i];
 int used = gw + TermUtils::vis_len(*lines[i]);
 int pad = content_w - used;
 if (pad > 0) r += TermUtils::spaces(pad);
-r += rst + "\n";
+r += " " + rst + "\n";
 }
 
 /* bottom blank */
@@ -548,7 +658,7 @@ if (callout_style.has_bg)
 {
 r += sp + TermUtils::apply_bg(callout_style.bg)
    + TermUtils::apply_fg(callout_style.border)
-   + std::string(" \xe2\x94\x83") + TermUtils::spaces(w - 2) + rst + "\n";
+   + std::string(" \xe2\x94\x83") + TermUtils::spaces(total_w - 2) + rst + "\n";
 }
 
 r += TermUtils::newlines(callout_style.space_after);
