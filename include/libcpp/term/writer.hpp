@@ -61,8 +61,11 @@ namespace libcpp
 **     *t*      italic
 **     ~~t~~    strikethrough
 **     ~t~      dim
+**     __t__    underline
+**     `t`      inline code
 **     $$ t/b   section (title / body)
 **     | a | b  table row (pipe-delimited)
+**     |:--|:--:|--:|  table alignment (left, center, right)
 **     (blank)  newline
 **     (other)  plain text
 **
@@ -96,6 +99,7 @@ TermWriter& italic(const std::string& msg);
 TermWriter& dim(const std::string& msg);
 TermWriter& underline(const std::string& msg);
 TermWriter& strike(const std::string& msg);
+TermWriter& code(const std::string& msg);
 TermWriter& quote(const std::string& msg);
 TermWriter& info(const std::string& msg);
 TermWriter& warn(const std::string& msg);
