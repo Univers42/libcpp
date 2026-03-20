@@ -35,6 +35,7 @@
 /* ── term ──────────────────────────────────────────────────────────────── */
 # include "libcpp/term/color.hpp"
 # include "libcpp/term/style.hpp"
+# include "libcpp/term/stylesheet.hpp"
 # include "libcpp/term/table.hpp"
 # include "libcpp/term/tree.hpp"
 # include "libcpp/term/progress.hpp"
