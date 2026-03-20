@@ -1,22 +1,44 @@
-# Build artifacts
+# ── Build artifacts ──────────────────────────────────────────────────────────
 *.o
+*.d
 *.a
+*.so
+*.dylib
 obj/
 
-# Binaries
+# ── Binaries ─────────────────────────────────────────────────────────────────
 test_runner
 demo_runner
+a.out
 demo/demo_libftpp
 lab/bin/
 
-# Build directories
+# ── Build directories ────────────────────────────────────────────────────────
 build/
 
-# Snapshot files
+# ── Snapshot files ───────────────────────────────────────────────────────────
 __snapshots__/
 
-# Editor
+# ── Editor and IDE ────────────────────────────────────────────────────────────
 *.swp
 *.swo
 *~
 .vscode/
+.idea/
+.DS_Store
+
+# ── Coverage / profiling ─────────────────────────────────────────────────────
+*.gcov
+*.gcda
+*.gcno
+*.profraw
+*.profdata
+
+# ── clangd / compile_commands ────────────────────────────────────────────────
+compile_commands.json
+.cache/
+
+# ── Sanitiser dumps ──────────────────────────────────────────────────────────
+*.asan
+*.msan
+*.tsan
