@@ -218,84 +218,89 @@ const ElemStyle& es, const std::string& label,
 const std::string* lines, int count) const
 {
 /*
-** Obsidian-style callout:
+** Obsidian-style callout with UNIFORM background width:
 **
-**   ┃  ⚠  Title                          ┃   ← header: border-colored bar + glyph + bold label
-**   ┃     Body line 1                     ┃   ← body:   bar + indented content
+**   ┃  ⚠  Title                          ┃
+**   ┃     Body line 1                     ┃
 **   ┃     Body line 2                     ┃
 **
-** The entire block has a tinted background.
-** The left bar uses the border color.
-** Header uses border color (bold).
-** Body uses fg color.
+** PHASE 1: Buffer all content lines and measure the widest one.
+** PHASE 2: Render all lines padded to uniform width for clean bg.
 */
-
-int w = es.width > 0 ? es.width : 60;
-int inner_w = w - 2;  /* left bar(2) */
-if (inner_w < 10) inner_w = 10;
 
 std::string rst = TermUtils::reset();
 std::string sp  = TermUtils::spaces(es.margin_l);
-std::string bar = TermUtils::apply_fg(es.border) + std::string(" \xe2\x94\x83 ") + rst;
+int gw = TermUtils::vis_len(es.glyph);
 
-/* measure bar visual width = 3 ( space, ┃, space ) */
+/* ── Phase 1: measure max content width ─────────────────────────── */
+int header_vis = gw + TermUtils::vis_len(label);
+int max_content = header_vis;
+for (int i = 0; i < count; ++i)
+{
+	if (lines[i].empty()) continue;
+	int lw = gw + TermUtils::vis_len(lines[i]);
+	if (lw > max_content) max_content = lw;
+}
+
+/* bar_vis = " ┃ " = 3 visible chars */
 int bar_vis = 3;
-int content_w = inner_w - bar_vis;
-if (content_w < 5) content_w = 5;
+int min_w = es.width > 0 ? es.width : 60;
+int content_w = max_content;
+if (content_w + bar_vis + 1 < min_w)
+	content_w = min_w - bar_vis - 1;
+int total_w = bar_vis + content_w + 1; /* +1 for trailing pad */
 
+/* ── Phase 2: render with uniform padding ───────────────────────── */
 std::string r;
 r += TermUtils::newlines(es.space_before);
 
 /* top blank line with bg */
 if (es.has_bg)
 {
-r += sp;
-r += TermUtils::apply_bg(es.bg);
-r += TermUtils::apply_fg(es.border);
-r += std::string(" \xe2\x94\x83") + TermUtils::spaces(w - 2) + rst + "\n";
+	r += sp;
+	r += TermUtils::apply_bg(es.bg);
+	r += TermUtils::apply_fg(es.border);
+	r += std::string(" \xe2\x94\x83") + TermUtils::spaces(total_w - 2) + rst + "\n";
 }
 
 /* header line: bar + glyph + label */
 {
-r += sp;
-if (es.has_bg) r += TermUtils::apply_bg(es.bg);
-r += TermUtils::apply_fg(es.border);
-r += std::string(" \xe2\x94\x83 ");
-r += TermUtils::apply_font(FONT_BOLD);
-r += es.glyph + label;
-int used = TermUtils::vis_len(es.glyph) + TermUtils::vis_len(label);
-int pad = content_w - used;
-if (pad > 0) r += TermUtils::spaces(pad);
-r += rst + "\n";
+	r += sp;
+	if (es.has_bg) r += TermUtils::apply_bg(es.bg);
+	r += TermUtils::apply_fg(es.border);
+	r += std::string(" \xe2\x94\x83 ");
+	r += TermUtils::apply_font(FONT_BOLD);
+	r += es.glyph + label;
+	int pad = content_w - header_vis;
+	if (pad > 0) r += TermUtils::spaces(pad);
+	r += " " + rst + "\n";
 }
 
 /* body lines */
 for (int i = 0; i < count; ++i)
 {
-if (lines[i].empty()) continue;
-r += sp;
-if (es.has_bg) r += TermUtils::apply_bg(es.bg);
-r += TermUtils::apply_fg(es.border);
-r += std::string(" \xe2\x94\x83 ");
-r += TermUtils::apply_fg(es.fg);
-r += TermUtils::apply_font(es.font);
-/* indent body by glyph width to align with header text */
-int gw = TermUtils::vis_len(es.glyph);
-r += TermUtils::spaces(gw);
-r += lines[i];
-int used = gw + TermUtils::vis_len(lines[i]);
-int pad = content_w - used;
-if (pad > 0) r += TermUtils::spaces(pad);
-r += rst + "\n";
+	if (lines[i].empty()) continue;
+	r += sp;
+	if (es.has_bg) r += TermUtils::apply_bg(es.bg);
+	r += TermUtils::apply_fg(es.border);
+	r += std::string(" \xe2\x94\x83 ");
+	r += TermUtils::apply_fg(es.fg);
+	r += TermUtils::apply_font(es.font);
+	r += TermUtils::spaces(gw);
+	r += lines[i];
+	int used = gw + TermUtils::vis_len(lines[i]);
+	int pad = content_w - used;
+	if (pad > 0) r += TermUtils::spaces(pad);
+	r += " " + rst + "\n";
 }
 
 /* bottom blank line with bg */
 if (es.has_bg)
 {
-r += sp;
-r += TermUtils::apply_bg(es.bg);
-r += TermUtils::apply_fg(es.border);
-r += std::string(" \xe2\x94\x83") + TermUtils::spaces(w - 2) + rst + "\n";
+	r += sp;
+	r += TermUtils::apply_bg(es.bg);
+	r += TermUtils::apply_fg(es.border);
+	r += std::string(" \xe2\x94\x83") + TermUtils::spaces(total_w - 2) + rst + "\n";
 }
 
 r += TermUtils::newlines(es.space_after);
@@ -315,6 +320,7 @@ TermWriter& TermWriter::italic(const std::string& m)   { _emit(_ts->italic(m)); 
 TermWriter& TermWriter::dim(const std::string& m)      { _emit(_ts->dim(m)); return *this; }
 TermWriter& TermWriter::underline(const std::string& m){ _emit(_ts->underline(m)); return *this; }
 TermWriter& TermWriter::strike(const std::string& m)   { _emit(_ts->strike(m)); return *this; }
+TermWriter& TermWriter::code(const std::string& m)     { _emit(_ts->code(m)); return *this; }
 TermWriter& TermWriter::quote(const std::string& m)    { _emit(_ts->quote(m)); return *this; }
 TermWriter& TermWriter::info(const std::string& m)     { _emit(_ts->info(m)); return *this; }
 TermWriter& TermWriter::warn(const std::string& m)     { _emit(_ts->warn(m)); return *this; }
@@ -357,9 +363,13 @@ return *this;
 /* -- table (imperative) ----------------------------------------------- */
 TermWriter& TermWriter::table(const Table& t)
 {
-std::string rendered = t.render();
+/* if the table has no explicit style, apply the writer's themed style */
+Table themed(t);
+if (!themed.has_custom_style())
+	themed.set_style(_table_style);
+std::string rendered = themed.render();
 if (!rendered.empty() && rendered[rendered.size() - 1] == '\n')
-rendered.erase(rendered.size() - 1);
+	rendered.erase(rendered.size() - 1);
 _emit(rendered);
 return *this;
 }
@@ -580,6 +590,28 @@ if (_is_table_line(line))
 if (_is_sep_line(line))
 {
 _table_has_header = true;
+/* parse column alignment from :---: / :--- / ---: */
+if (_pending_table)
+{
+std::string cells[8];
+int n = _split_pipe(line, cells, 8);
+for (int i = 0; i < n; ++i)
+{
+std::string c = cells[i];
+/* strip spaces from the alignment cell */
+std::string::size_type a = c.find_first_not_of(' ');
+std::string::size_type b = c.find_last_not_of(' ');
+if (a == std::string::npos) continue;
+std::string stripped = c.substr(a, b - a + 1);
+bool left_colon  = (!stripped.empty() && stripped[0] == ':');
+bool right_colon = (!stripped.empty() && stripped[stripped.size()-1] == ':');
+if (left_colon && right_colon)
+_pending_table->set_col_align(i, ALIGN_CENTER);
+else if (right_colon)
+_pending_table->set_col_align(i, ALIGN_RIGHT);
+/* else left or default: ALIGN_LEFT (default) */
+}
+}
 }
 else
 {
@@ -722,6 +754,22 @@ section(stitle, sbody);
 }
 else
 section(content, "");
+return;
+}
+
+/* `code` */
+if (line[0] == '`' && line.size() > 2
+&& line[line.size()-1] == '`' && line[1] != '`')
+{
+code(line.substr(1, line.size() - 2));
+return;
+}
+
+/* __underline__ */
+if (_starts_with(line, "__") && line.size() > 4
+&& line[line.size()-1] == '_' && line[line.size()-2] == '_')
+{
+underline(line.substr(2, line.size() - 4));
 return;
 }
 
