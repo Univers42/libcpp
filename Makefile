@@ -90,6 +90,22 @@ STUDIO_TEST_BIN   = build/bin/studio/tests/test_runner
 compile_studio: $(NAME) $(STUDIO_DEMO_BIN) $(STUDIO_TEST_BIN)
 	@printf "  $(GREEN)●$(RESET) $(BOLD)compile_studio$(RESET) $(DIM)done$(RESET)\n"
 
+# ── run_demos: compile and execute all studio demos ──────────────────────────
+
+run_demos: compile_studio
+	@printf "  $(BOLD)running all demos$(RESET)\n"
+	@for bin in $(STUDIO_DEMO_BIN); do \
+		printf "  $(DIM)→$(RESET) $(CYAN)%-40s$(RESET) " "$$(basename $$bin)"; \
+		$$bin > /dev/null 2>&1 \
+			&& printf "$(GREEN)OK$(RESET)\n" \
+			|| printf "$(RED)FAIL$(RESET)\n"; \
+	done
+
+# ── run_tests: compile and run the studio test suite ─────────────────────────
+
+run_tests: compile_studio
+	@$(STUDIO_TEST_BIN)
+
 build/bin/studio/demo/%: studio/demo/%.cpp $(NAME)
 	@mkdir -p $(dir $@)
 	@printf "  $(DIM)studio/demo$(RESET)  $(CYAN)%-30s$(RESET)\n" "$(notdir $<)"
@@ -109,4 +125,4 @@ stats:
 	@printf "  $(BOLD)test files  $(RESET) $(YELLOW)%s$(RESET)\n" "$$(find tests -name '*.cpp' | wc -l)"
 	@printf "  $(BOLD)total lines $(RESET) $(YELLOW)%s$(RESET)\n" "$$(find include src tests -name '*.hpp' -o -name '*.cpp' | xargs wc -l | tail -1 | awk '{print $$1}')"
 
-.PHONY: all clean fclean re test demo stats compile_studio
+.PHONY: all clean fclean re test demo stats compile_studio run_demos run_tests
