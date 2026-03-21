@@ -495,6 +495,47 @@ static void test_databuffer_setraw(libcpp::test::TestSuite& s)
     ASSERT_EQ_STR(s, str, "raw");
 }
 
+/* ── PerlinNoise2D determinism ──────────────────────────────────────────── */
+
+static void test_perlin_determinism(libcpp::test::TestSuite& s)
+{
+    libcpp::math::PerlinNoise2D a(99);
+    libcpp::math::PerlinNoise2D b(99);
+    // Same seed → same results across instances
+    for (double x = -2.0; x <= 2.0; x += 0.7)
+        for (double y = -2.0; y <= 2.0; y += 0.7)
+            ASSERT_TRUE(s, a.sample(x, y) == b.sample(x, y));
+}
+
+/* ── ObservableValue no-fire on same value ──────────────────────────────── */
+
+static void test_observable_no_fire(libcpp::test::TestSuite& s)
+{
+    libcpp::core::ObservableValue<int> v(42);
+    int fires = 0;
+    v.subscribe([&](const int&) { fires++; });
+    v = 42;  // same value → should not fire
+    ASSERT_EQ(s, fires, 0);
+    v = 43;  // different → should fire
+    ASSERT_EQ(s, fires, 1);
+}
+
+/* ── Chronometer pause/resume ───────────────────────────────────────────── */
+
+static void test_chronometer_pause(libcpp::test::TestSuite& s)
+{
+    libcpp::util::Chronometer c;
+    c.start();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    c.stop();
+    double t1 = c.elapsedMilliseconds();
+    c.start();  // resume
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    c.stop();
+    double t2 = c.elapsedMilliseconds();
+    ASSERT_TRUE(s, t2 >= t1);  // accumulated time should be >= first stop
+}
+
 /* ── Suite runner ───────────────────────────────────────────────────────── */
 
 void run_libftpp_tests(void)
@@ -549,6 +590,9 @@ void run_libftpp_tests(void)
     s.test("Timer::setTimeout", test_timer_timeout);
     s.test("Timer::setInterval", test_timer_interval);
     s.test("DataBuffer::setRaw", test_databuffer_setraw);
+    s.test("PerlinNoise2D::determinism", test_perlin_determinism);
+    s.test("ObservableValue::no_fire_same", test_observable_no_fire);
+    s.test("Chronometer::pause_resume", test_chronometer_pause);
 
     s.run();
 }
