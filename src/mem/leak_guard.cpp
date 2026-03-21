@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 22:06:06 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 22:23:30 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,7 +297,14 @@ void* operator new(std::size_t size)
 	return ptr;
 }
 
-void operator delete(void* ptr) throw()
+void operator delete(void* ptr) noexcept
+{
+	if (!ptr) return;
+	libcpp::mem::LeakGuard::record_delete(ptr);
+	std::free(ptr);
+}
+
+void operator delete(void* ptr, std::size_t) noexcept
 {
 	if (!ptr) return;
 	libcpp::mem::LeakGuard::record_delete(ptr);
@@ -312,7 +319,14 @@ void* operator new[](std::size_t size)
 	return ptr;
 }
 
-void operator delete[](void* ptr) throw()
+void operator delete[](void* ptr) noexcept
+{
+	if (!ptr) return;
+	libcpp::mem::LeakGuard::record_delete(ptr);
+	std::free(ptr);
+}
+
+void operator delete[](void* ptr, std::size_t) noexcept
 {
 	if (!ptr) return;
 	libcpp::mem::LeakGuard::record_delete(ptr);

@@ -1,20 +1,21 @@
 # ══════════════════════════════════════════════════════════════════════════════
-#  libcpp — shared utility library for all CPP Module 04 exercises
+#  libcpp / libftpp — C++17 utility & systems library
 #
-#  Builds a static archive  libcpp.a  that exercises link against.
+#  Builds two identical static archives:
+#    libcpp.a   — primary name
+#    libftpp.a  — alias required by the libftpp subject
 #
-#  Usage from an exercise Makefile:
+#  Usage:
 #    $(MAKE) -C ../libcpp
-#    $(CXX) ... -L../libcpp -I../libcpp ... -lcpp
-#  or simply link the .a directly:
-#    $(CXX) ... objs... ../libcpp/libcpp.a
+#    $(CXX) ... -L../libcpp -I../libcpp/include -lcpp
 # ══════════════════════════════════════════════════════════════════════════════
 
 CXX      = c++
-CXXFLAGS = -std=c++98 -Wall -Wextra -Werror -Iinclude
+CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -Iinclude -pthread
 AR       = ar rcs
 
 NAME     = libcpp.a
+FTNAME   = libftpp.a
 OBJ_DIR  = obj
 
 # All .cpp files under src/
@@ -31,11 +32,15 @@ YELLOW = \033[93m
 
 # ── Targets ──────────────────────────────────────────────────────────────────
 
-all: $(NAME)
+all: $(NAME) $(FTNAME)
 
 $(NAME): $(OBJ)
 	@$(AR) $@ $(OBJ)
 	@printf "  $(GREEN)●$(RESET) $(BOLD)$(NAME)$(RESET) $(DIM)archived ($(words $(OBJ)) objects)$(RESET)\n"
+
+$(FTNAME): $(NAME)
+	@cp $(NAME) $(FTNAME)
+	@printf "  $(GREEN)●$(RESET) $(BOLD)$(FTNAME)$(RESET) $(DIM)(alias of $(NAME))$(RESET)\n"
 
 $(OBJ_DIR)/%.o: src/%.cpp | $(OBJ_DIR)
 	@mkdir -p $(dir $@)
@@ -49,7 +54,7 @@ clean:
 	@rm -rf $(OBJ_DIR)
 
 fclean: clean
-	@rm -f $(NAME)
+	@rm -f $(NAME) $(FTNAME)
 
 re: fclean all
 
