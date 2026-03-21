@@ -239,6 +239,29 @@ std::vector<DbRow> Database::where(const std::string& column,
 
 std::size_t Database::count() const { return _table.row_count(); }
 
+void Database::sort(const std::string& column, bool ascending)
+{
+	_table = db_sort_by(_table, column, ascending);
+}
+
+Database Database::limit(std::size_t max_rows) const
+{
+	Database result;
+	const std::vector<DbColumn>& cols = _table.columns();
+	for (std::size_t i = 0; i < cols.size(); ++i)
+		result.add_column(cols[i].name(), cols[i].type(), cols[i].align());
+	const std::vector<DbRow>& all = _table.rows();
+	std::size_t n = all.size() < max_rows ? all.size() : max_rows;
+	for (std::size_t i = 0; i < n; ++i)
+	{
+		std::map<std::string, std::string> data;
+		for (std::size_t c = 0; c < cols.size(); ++c)
+			data[cols[c].name()] = all[i].get_value(cols[c].name());
+		result.add_row(data);
+	}
+	return result;
+}
+
 /* ── Export utilities ───────────────────────────────────────────────────── */
 
 void export_csv(const DbTable& table, const std::string& path)

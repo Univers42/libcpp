@@ -135,6 +135,9 @@ public:
 							 const std::string& value) const;
 	std::size_t count() const;
 
+	void sort(const std::string& column, bool ascending = true);
+	Database limit(std::size_t max_rows) const;
+
 private:
 	DbTable _table;
 };
