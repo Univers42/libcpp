@@ -133,6 +133,9 @@ public:
 	void set_headers(const std::vector<std::string>& h);
 	void clear();
 
+	/* Sort rows by column (ascending/descending) */
+	void sort_by(const std::string& column, bool ascending = true);
+
 private:
 	std::vector<CsvRow>                _rows;
 	std::vector<std::string>           _headers;

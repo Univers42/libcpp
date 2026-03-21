@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 21:44:06 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 22:06:00 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cctype>
 #include <cmath>
+#include <algorithm>
 
 namespace libcpp
 {
@@ -404,6 +405,38 @@ void CsvDocument::clear()
 	_headers.clear();
 	_col_map.clear();
 	_error.clear();
+}
+
+namespace {
+struct RowCmpAsc {
+	std::size_t _col;
+	RowCmpAsc(std::size_t c) : _col(c) {}
+	bool operator()(const CsvRow& a, const CsvRow& b) const
+	{
+		if (_col >= a.size() || _col >= b.size()) return false;
+		return a[_col] < b[_col];
+	}
+};
+struct RowCmpDesc {
+	std::size_t _col;
+	RowCmpDesc(std::size_t c) : _col(c) {}
+	bool operator()(const CsvRow& a, const CsvRow& b) const
+	{
+		if (_col >= a.size() || _col >= b.size()) return false;
+		return a[_col] > b[_col];
+	}
+};
+} /* anonymous */
+
+void CsvDocument::sort_by(const std::string& column, bool ascending)
+{
+	int idx = get_column_index(column);
+	if (idx < 0) return;
+	std::size_t col = static_cast<std::size_t>(idx);
+	if (ascending)
+		std::sort(_rows.begin(), _rows.end(), RowCmpAsc(col));
+	else
+		std::sort(_rows.begin(), _rows.end(), RowCmpDesc(col));
 }
 
 std::string CsvDocument::_escape_field(const std::string& f,
