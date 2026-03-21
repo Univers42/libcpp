@@ -4,6 +4,7 @@
 // Wraps std::thread, sets threadSafeCout prefix from thread name,
 // runs a user callback in the managed thread.
 
+#include <atomic>
 #include <functional>
 #include <string>
 #include <thread>
@@ -37,7 +38,7 @@ private:
     std::string           _name;
     std::function<void()> _callback;
     std::thread           _thread;
-    bool                  _running = false;
+    std::atomic<bool>     _running{false};
 };
 
 } // namespace async

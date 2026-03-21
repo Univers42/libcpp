@@ -5,6 +5,7 @@
 // until stop() is called. New tasks can be added at runtime.
 
 #include "libcpp/async/thread_safe_queue.hpp"
+#include <atomic>
 #include <functional>
 #include <map>
 #include <string>
@@ -42,8 +43,8 @@ private:
     std::string                                               _name;
     std::vector<std::pair<std::string, std::function<void()>>> _tasks;
     std::thread                                               _thread;
-    bool                                                      _running  = false;
-    bool                                                      _stopFlag = false;
+    std::atomic<bool>                                         _running{false};
+    std::atomic<bool>                                         _stopFlag{false};
 };
 
 } // namespace async
