@@ -155,6 +155,7 @@ public:
 	std::size_t slot_count() const { return _slots.size(); }
 
 	void clear() { _clear(); }
+	void disconnect_all() { _clear(); }
 
 private:
 	std::map<ConnectionId, ISlot<A>*>	_slots;
@@ -205,6 +206,7 @@ public:
 
 	std::size_t slot_count() const { return _fns.size(); }
 	void clear() { _fns.clear(); }
+	void disconnect_all() { _fns.clear(); }
 
 private:
 	std::map<ConnectionId, SlotFn>	_fns;
