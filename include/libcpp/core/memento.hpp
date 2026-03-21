@@ -1,0 +1,38 @@
+#pragma once
+// memento.hpp — Memento design pattern with DataBuffer-backed snapshots.
+//
+// Inherit from Memento and implement _saveToSnapshot / _loadFromSnapshot
+// as private methods (with Memento declared as friend).
+// Snapshot is a DataBuffer, enabling elegant serialization reuse.
+
+#include "libcpp/data/data_buffer.hpp"
+#include <vector>
+
+namespace libcpp {
+namespace core {
+
+class Memento {
+public:
+    using Snapshot = data::DataBuffer;
+
+    virtual ~Memento() = default;
+
+    Snapshot save() const;
+    void     load(const Snapshot& state);
+
+    // History management (undo/redo)
+    void pushHistory();
+    bool undo();
+    bool redo();
+    size_t historySize() const;
+
+private:
+    virtual void _saveToSnapshot(Snapshot& snapshot) const = 0;
+    virtual void _loadFromSnapshot(Snapshot& snapshot) = 0;
+
+    std::vector<Snapshot> _history;
+    size_t                _historyPos = 0;
+};
+
+} // namespace core
+} // namespace libcpp
