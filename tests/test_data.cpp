@@ -114,6 +114,49 @@ static void test_database_add_query(libcpp::test::TestSuite& s)
 	ASSERT_EQ_STR(s, res[0].get_value("Name"), "Alice");
 }
 
+static void test_date_weekend(libcpp::test::TestSuite& s)
+{
+	/* 2024-03-16 is Saturday, 2024-03-18 is Monday */
+	libcpp::data::Date sat(2024, 3, 16);
+	libcpp::data::Date mon(2024, 3, 18);
+	ASSERT_TRUE(s, sat.is_weekend());
+	ASSERT_FALSE(s, mon.is_weekend());
+	ASSERT_TRUE(s, mon.is_weekday());
+}
+
+static void test_date_epoch(libcpp::test::TestSuite& s)
+{
+	libcpp::data::Date d(2024, 1, 1);
+	long ep = d.to_epoch();
+	libcpp::data::Date d2 = libcpp::data::Date::from_epoch(ep);
+	ASSERT_EQ(s, d2.year(), 2024);
+	ASSERT_EQ(s, d2.month(), 1);
+	ASSERT_EQ(s, d2.day(), 1);
+}
+
+static void test_csv_sort(libcpp::test::TestSuite& s)
+{
+	std::istringstream iss("Name,Val\nCharlie,3\nAlice,1\nBob,2\n");
+	libcpp::data::CsvDocument doc;
+	doc.load_stream(iss);
+	doc.sort_by("Name");
+	ASSERT_EQ_STR(s, doc.rows()[0][0], "Alice");
+	ASSERT_EQ_STR(s, doc.rows()[1][0], "Bob");
+	ASSERT_EQ_STR(s, doc.rows()[2][0], "Charlie");
+}
+
+static void test_db_row_has_key(libcpp::test::TestSuite& s)
+{
+	libcpp::data::Database db;
+	db.add_column("Name");
+	std::map<std::string, std::string> r1;
+	r1["Name"] = "Alice";
+	db.add_row(r1);
+	std::vector<libcpp::data::DbRow> rows = db.where("Name", "Alice");
+	ASSERT_TRUE(s, rows[0].has_key("Name"));
+	ASSERT_FALSE(s, rows[0].has_key("Age"));
+}
+
 /* ── Run ────────────────────────────────────────────────────────────────── */
 
 void run_data_tests(void)
@@ -129,5 +172,9 @@ void run_data_tests(void)
 	s.test("CSV::parse_stream",  &test_csv_parse_stream);
 	s.test("CSV::aggregate",     &test_csv_aggregate);
 	s.test("Database::add_query", &test_database_add_query);
+	s.test("Date::weekend",      &test_date_weekend);
+	s.test("Date::epoch",        &test_date_epoch);
+	s.test("CSV::sort_by",       &test_csv_sort);
+	s.test("DbRow::has_key",     &test_db_row_has_key);
 	s.run();
 }

@@ -95,6 +95,47 @@ static void test_eq_nocase(libcpp::test::TestSuite& s)
 	ASSERT_TRUE(s, libcpp::str::eq_nocase("ABC", "abc"));
 }
 
+static void test_contains(libcpp::test::TestSuite& s)
+{
+	ASSERT_TRUE(s, libcpp::str::contains("hello world", "world"));
+	ASSERT_FALSE(s, libcpp::str::contains("hello world", "xyz"));
+}
+
+static void test_count(libcpp::test::TestSuite& s)
+{
+	ASSERT_EQ(s, libcpp::str::count("abcabc", "abc"), 2);
+	ASSERT_EQ(s, libcpp::str::count("aaa", "z"), 0);
+}
+
+static void test_reverse(libcpp::test::TestSuite& s)
+{
+	ASSERT_EQ_STR(s, libcpp::str::reverse("abc"), "cba");
+}
+
+static void test_center(libcpp::test::TestSuite& s)
+{
+	ASSERT_EQ_STR(s, libcpp::str::center("hi", 6, '-'), "--hi--");
+}
+
+static void test_truncate(libcpp::test::TestSuite& s)
+{
+	ASSERT_EQ_STR(s, libcpp::str::truncate("hello world", 8, "..."), "hello...");
+}
+
+static void test_is_blank(libcpp::test::TestSuite& s)
+{
+	ASSERT_TRUE(s, libcpp::str::is_blank("   \t\n"));
+	ASSERT_FALSE(s, libcpp::str::is_blank("  x  "));
+	ASSERT_TRUE(s, libcpp::str::is_empty(""));
+	ASSERT_FALSE(s, libcpp::str::is_empty(" "));
+}
+
+static void test_capitalize(libcpp::test::TestSuite& s)
+{
+	ASSERT_EQ_STR(s, libcpp::str::capitalize("hello"), "Hello");
+	ASSERT_EQ_STR(s, libcpp::str::capitalize(""), "");
+}
+
 void run_str_tests(void)
 {
 	libcpp::test::TestSuite s("str");
@@ -112,5 +153,12 @@ void run_str_tests(void)
 	s.test("to_snake_case",  &test_to_snake_case);
 	s.test("to_camel_case",  &test_to_camel_case);
 	s.test("eq_nocase",      &test_eq_nocase);
+	s.test("contains",       &test_contains);
+	s.test("count",          &test_count);
+	s.test("reverse",        &test_reverse);
+	s.test("center",         &test_center);
+	s.test("truncate",       &test_truncate);
+	s.test("is_blank/empty", &test_is_blank);
+	s.test("capitalize",     &test_capitalize);
 	s.run();
 }

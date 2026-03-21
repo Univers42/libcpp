@@ -241,15 +241,25 @@ std::string Date::to_iso() const
 
 long Date::to_epoch() const
 {
-	struct std::tm t;
-	t.tm_year = _year - 1900;
-	t.tm_mon  = _month - 1;
-	t.tm_mday = _day;
-	t.tm_hour = 0;
-	t.tm_min  = 0;
-	t.tm_sec  = 0;
-	t.tm_isdst = -1;
-	return static_cast<long>(std::mktime(&t));
+	/* Manual calculation — days from 1970-01-01 to this date, then *86400 */
+	int y = _year;
+	int m = _month;
+	int d = _day;
+	/* Adjust so March=1 for easier leap handling */
+	if (m <= 2) { y--; m += 12; }
+	long era_days = 365L * (y - 1970);
+	/* add leap days from 1970 to y */
+	era_days += (y / 4 - 1970 / 4) - (y / 100 - 1970 / 100) + (y / 400 - 1970 / 400);
+	/* add days for months March..m (shifted calendar) */
+	static const int cum[] = {0, 31, 61, 92, 122, 153, 184, 214, 245, 275, 306, 337};
+	era_days += cum[m - 3];
+	era_days += d - 1;
+	/* Un-shift: we shifted so year starts in March. Add Jan+Feb days back */
+	/* Actually simpler: use Julian day approach */
+	/* Rewrite with _to_julian */
+	long jd = static_cast<long>(_to_julian());
+	long epoch_jd = 2440588L; /* JD of 1970-01-01 */
+	return (jd - epoch_jd) * 86400L;
 }
 
 std::string Date::to_string(const std::string& fmt) const
