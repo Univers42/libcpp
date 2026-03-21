@@ -44,7 +44,6 @@ public:
 
 	/* Validation */
 	bool is_valid() const;
-	static bool is_leap_year(int y);
 
 	/* Calendar helpers */
 	int  weekday() const;               /* 0=Sun … 6=Sat */
