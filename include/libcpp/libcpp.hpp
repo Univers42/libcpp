@@ -87,9 +87,9 @@
 # include "libcpp/net/server.hpp"
 
 /* ── math ──────────────────────────────────────────────────────────────── */
-// # include "libcpp/math/ivector2.hpp"
-// # include "libcpp/math/ivector3.hpp"
-// # include "libcpp/math/random_2d_coordinate_generator.hpp"
-// # include "libcpp/math/perlin_noise_2d.hpp"
+# include "libcpp/math/ivector2.hpp"
+# include "libcpp/math/ivector3.hpp"
+# include "libcpp/math/random_2d_coordinate_generator.hpp"
+# include "libcpp/math/perlin_noise_2d.hpp"
 
 #endif /* LIBCPP_LIBCPP_HPP */
