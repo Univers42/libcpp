@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 22:06:04 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 22:06:29 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,26 @@ public:
 	double        next_double();
 	bool          next_bool();
 	char          next_char(char lo, char hi);
+
+	/* Shuffle an array in-place (Fisher-Yates) */
+	template <typename T>
+	void shuffle(T* arr, int count)
+	{
+		for (int i = count - 1; i > 0; --i)
+		{
+			int j = next_int(0, i);
+			T tmp = arr[i];
+			arr[i] = arr[j];
+			arr[j] = tmp;
+		}
+	}
+
+	/* Pick a random element */
+	template <typename T>
+	const T& pick(const T* arr, int count)
+	{
+		return arr[next_int(0, count - 1)];
+	}
 
 	void          seed(unsigned long s);
 
