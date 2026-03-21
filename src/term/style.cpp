@@ -160,6 +160,39 @@ int TermUtils::visible_width(const std::string& s)
 	return static_cast<int>(strip_ansi(s).size());
 }
 
+std::string TermUtils::word_wrap(const std::string& text, int width)
+{
+	std::string result;
+	int col = 0;
+	std::string word;
+	for (std::size_t i = 0; i <= text.size(); ++i)
+	{
+		char c = (i < text.size()) ? text[i] : ' ';
+		if (c == ' ' || c == '\n' || i == text.size())
+		{
+			if (!word.empty())
+			{
+				int wlen = static_cast<int>(word.size());
+				if (col > 0 && col + 1 + wlen > width)
+				{
+					result += '\n';
+					col = 0;
+				}
+				if (col > 0) { result += ' '; ++col; }
+				result += word;
+				col += wlen;
+				word.clear();
+			}
+			if (c == '\n') { result += '\n'; col = 0; }
+		}
+		else
+		{
+			word += c;
+		}
+	}
+	return result;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
  *  ElemStyle
  * ═════════════════════════════════════════════════════════════════════════ */

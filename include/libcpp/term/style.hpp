@@ -38,6 +38,7 @@ struct TermUtils
 	static std::string apply_font(int flags);
 	static std::string strip_ansi(const std::string& s);
 	static int visible_width(const std::string& s);
+	static std::string word_wrap(const std::string& text, int width);
 };
 
 /* ══════════════════════════════════════════════════════════════════════════
