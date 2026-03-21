@@ -67,4 +67,13 @@ test: $(NAME)
 	@$(CXX) $(CXXFLAGS) $(TEST_SRC) -L. -lcpp -o $(TEST_BIN)
 	@./$(TEST_BIN)
 
-.PHONY: all clean fclean re test
+# ── Demo ─────────────────────────────────────────────────────────────────────
+
+DEMO_SRC = demo/demo_libftpp.cpp
+DEMO_BIN = demo/demo_libftpp
+
+demo: $(NAME)
+	@$(CXX) $(CXXFLAGS) -I. $(DEMO_SRC) -L. -lcpp -o $(DEMO_BIN)
+	@./$(DEMO_BIN)
+
+.PHONY: all clean fclean re test demo

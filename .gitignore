@@ -6,6 +6,7 @@ obj/
 # Binaries
 test_runner
 demo_runner
+demo/demo_libftpp
 
 # Snapshot files
 __snapshots__/
