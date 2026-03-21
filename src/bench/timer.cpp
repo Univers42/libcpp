@@ -53,6 +53,7 @@ double ScopeTimer::elapsed_ms() const
 }
 
 void ScopeTimer::reset() { _start = std::clock(); }
+const std::string& ScopeTimer::label() const { return _label; }
 
 /* ── StopWatch ─────────────────────────────────────────────────────────── */
 

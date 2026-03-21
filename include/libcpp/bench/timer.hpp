@@ -36,6 +36,7 @@ public:
 	/* Manual query */
 	double elapsed_ms() const;
 	void   reset();
+	const std::string& label() const;
 
 private:
 	std::string _label;
