@@ -67,6 +67,8 @@ public:
 	bool is_dark() const;
 	bool is_light() const;
 	double contrast_ratio(const Srgb& other) const;
+	double distance(const Srgb& other) const;
+	Srgb   blend(const Srgb& other, double t) const;
 	double luminance() const;
 	int to_ansi_256() const;
 

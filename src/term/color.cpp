@@ -168,6 +168,24 @@ double Srgb::contrast_ratio(const Srgb& other) const
 	return (l1 + 0.05) / (l2 + 0.05);
 }
 
+double Srgb::distance(const Srgb& other) const
+{
+	double dr = static_cast<double>(get_r()) - static_cast<double>(other.get_r());
+	double dg = static_cast<double>(get_g()) - static_cast<double>(other.get_g());
+	double db = static_cast<double>(get_b()) - static_cast<double>(other.get_b());
+	return std::sqrt(dr * dr + dg * dg + db * db);
+}
+
+Srgb Srgb::blend(const Srgb& other, double t) const
+{
+	if (t <= 0.0) return *this;
+	if (t >= 1.0) return other;
+	unsigned char r = static_cast<unsigned char>(get_r() + (other.get_r() - get_r()) * t);
+	unsigned char g = static_cast<unsigned char>(get_g() + (other.get_g() - get_g()) * t);
+	unsigned char b = static_cast<unsigned char>(get_b() + (other.get_b() - get_b()) * t);
+	return Srgb(r, g, b);
+}
+
 double Srgb::luminance() const
 {
 	return 0.299 * get_r() + 0.587 * get_g() + 0.114 * get_b();
