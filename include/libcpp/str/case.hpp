@@ -25,6 +25,7 @@ namespace str
 std::string to_upper(const std::string& s);
 std::string to_lower(const std::string& s);
 std::string to_title(const std::string& s);
+std::string capitalize(const std::string& s);
 std::string toggle_case(const std::string& s);
 
 /* ── Case-insensitive comparison ───────────────────────────────────────── */

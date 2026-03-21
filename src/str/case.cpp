@@ -164,6 +164,18 @@ std::string toggle_case(const std::string& s)
 	return out;
 }
 
+std::string capitalize(const std::string& s)
+{
+	if (s.empty()) return s;
+	std::string out;
+	out.reserve(s.size());
+	std::size_t idx = 0;
+	uint32_t first = decode_utf8(s, idx);
+	append_utf8(out, _to_upper_cp(first));
+	out += s.substr(idx);
+	return out;
+}
+
 bool eq_nocase(const std::string& a, const std::string& b)
 {
 	return to_lower(a) == to_lower(b);
