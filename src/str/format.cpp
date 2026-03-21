@@ -239,6 +239,19 @@ std::string truncate(const std::string& s, int max_len,
 	return s.substr(0, max_len - suf_len) + suffix;
 }
 
+bool is_empty(const std::string& s) { return s.empty(); }
+
+bool is_blank(const std::string& s)
+{
+	for (std::size_t i = 0; i < s.size(); ++i)
+	{
+		if (s[i] != ' ' && s[i] != '\t' && s[i] != '\n'
+			&& s[i] != '\r' && s[i] != '\f' && s[i] != '\v')
+			return false;
+	}
+	return true;
+}
+
 /* ── Message ───────────────────────────────────────────────────────────── */
 
 Message::Message() {}
