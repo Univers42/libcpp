@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 21:04:22 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:38:47 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,11 @@ public:
 	/* Iteration */
 	int                 entry_count() const;
 	const ConfigEntry&  entry(int i) const;
+
+	/* Section listing */
+	int  sections(std::string* out, int max) const;
+	int  section_count() const;
+	bool remove(const std::string& section, const std::string& key);
 
 	/* Clear all entries */
 	void clear();

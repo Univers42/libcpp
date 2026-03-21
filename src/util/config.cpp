@@ -305,5 +305,46 @@ void Config::clear()
 	_count = 0;
 }
 
+int Config::sections(std::string* out, int max) const
+{
+	int n = 0;
+	for (int i = 0; i < _count && n < max; ++i)
+	{
+		bool dup = false;
+		for (int j = 0; j < n; ++j)
+		{
+			if (out[j] == _entries[i].section) { dup = true; break; }
+		}
+		if (!dup) out[n++] = _entries[i].section;
+	}
+	return n;
+}
+
+int Config::section_count() const
+{
+	std::string seen[MAX_ENTRIES];
+	int n = 0;
+	for (int i = 0; i < _count; ++i)
+	{
+		bool dup = false;
+		for (int j = 0; j < n; ++j)
+		{
+			if (seen[j] == _entries[i].section) { dup = true; break; }
+		}
+		if (!dup) seen[n++] = _entries[i].section;
+	}
+	return n;
+}
+
+bool Config::remove(const std::string& section, const std::string& key)
+{
+	int idx = _find(section, key);
+	if (idx < 0) return false;
+	for (int i = idx; i < _count - 1; ++i)
+		_entries[i] = _entries[i + 1];
+	_entries[--_count] = ConfigEntry();
+	return true;
+}
+
 } /* namespace util */
 } /* namespace libcpp */
