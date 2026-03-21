@@ -37,6 +37,7 @@ struct TermUtils
 	static std::string apply_bg(const Srgb& c);
 	static std::string apply_font(int flags);
 	static std::string strip_ansi(const std::string& s);
+	static int visible_width(const std::string& s);
 };
 
 /* ══════════════════════════════════════════════════════════════════════════

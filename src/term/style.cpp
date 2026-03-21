@@ -155,6 +155,11 @@ std::string TermUtils::strip_ansi(const std::string& s)
 	return out;
 }
 
+int TermUtils::visible_width(const std::string& s)
+{
+	return static_cast<int>(strip_ansi(s).size());
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
  *  ElemStyle
  * ═════════════════════════════════════════════════════════════════════════ */
