@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 20:53:31 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:40:18 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,10 @@ public:
 	std::string gen_alpha_string(int min_len, int max_len);
 	std::string gen_numeric_string(int len);
 	std::string gen_hex_string(int len);
+
+	/* Structured data */
+	std::string gen_email();
+	std::string gen_uuid();
 
 	/* Containers (writes into caller's buffer) */
 	int         gen_int_array(int* out, int count, int lo, int hi);

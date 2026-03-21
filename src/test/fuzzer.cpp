@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 20:54:17 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:40:19 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,21 @@ int Generator::gen_int_array(int* out, int count, int lo, int hi)
 {
 	for (int i = 0; i < count; ++i) out[i] = _rng.next_int(lo, hi);
 	return count;
+}
+
+std::string Generator::gen_email()
+{
+	std::string user = gen_alpha_string(4, 10);
+	static const char* domains[] = { "example.com", "test.org", "mail.net", "dummy.io" };
+	return user + "@" + domains[_rng.next_int(0, 3)];
+}
+
+std::string Generator::gen_uuid()
+{
+	std::string h = gen_hex_string(32);
+	/* 8-4-4-4-12 */
+	return h.substr(0, 8) + "-" + h.substr(8, 4) + "-" +
+		   h.substr(12, 4) + "-" + h.substr(16, 4) + "-" + h.substr(20, 12);
 }
 
 Rng& Generator::rng() { return _rng; }
