@@ -147,6 +147,15 @@ public:
 	bool empty() const           { return _count == 0; }
 	bool full() const            { return _count == _capacity; }
 
+	/* ── find: returns index of first element equal to val, or capacity if not found ── */
+	Index find(const T& val) const
+	{
+		for (std::size_t i = 0; i < _capacity; ++i)
+			if (_alive[i] && _data[i] == val)
+				return i;
+		return _capacity;
+	}
+
 	/* ── iteration (callback receives index and const reference) ── */
 	void for_each(void (*fn)(Index, const T&)) const
 	{
