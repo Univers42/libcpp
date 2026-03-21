@@ -71,6 +71,7 @@ public:
 
 	/* ── read ──────────────────────────────────────────────────── */
 	const T& get() const { return _val; }
+	operator const T&() const { return _val; }
 
 	/* ── write (fires on_change if value differs) ──────────────── */
 	Property& set(const T& val)
@@ -82,6 +83,16 @@ public:
 			ChangePair<T> cp(old, _val);
 			on_change.emit(cp);
 		}
+		return *this;
+	}
+
+	/* ── force_set (always fires on_change, even if the same) ──── */
+	Property& force_set(const T& val)
+	{
+		T old = _val;
+		_val = val;
+		ChangePair<T> cp(old, _val);
+		on_change.emit(cp);
 		return *this;
 	}
 
