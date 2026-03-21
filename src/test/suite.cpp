@@ -67,15 +67,18 @@ TestResult::~TestResult() {}
 
 TestSuite::TestSuite()
 	: _name("TestSuite"), _test_count(0), _result_count(0),
-	  _before_each(0), _after_each(0), _passed(0), _failed(0), _skipped(0) {}
+	  _before_each(0), _after_each(0), _before_all(0), _after_all(0),
+	  _passed(0), _failed(0), _skipped(0) {}
 
 TestSuite::TestSuite(const std::string& name)
 	: _name(name), _test_count(0), _result_count(0),
-	  _before_each(0), _after_each(0), _passed(0), _failed(0), _skipped(0) {}
+	  _before_each(0), _after_each(0), _before_all(0), _after_all(0),
+	  _passed(0), _failed(0), _skipped(0) {}
 
 TestSuite::TestSuite(const TestSuite& o)
 	: _name(o._name), _test_count(o._test_count), _result_count(o._result_count),
 	  _before_each(o._before_each), _after_each(o._after_each),
+	  _before_all(o._before_all), _after_all(o._after_all),
 	  _passed(o._passed), _failed(o._failed), _skipped(o._skipped)
 {
 	for (int i = 0; i < _test_count; ++i) _tests[i] = o._tests[i];
@@ -91,6 +94,8 @@ TestSuite& TestSuite::operator=(const TestSuite& o)
 		_result_count = o._result_count;
 		_before_each = o._before_each;
 		_after_each = o._after_each;
+		_before_all = o._before_all;
+		_after_all = o._after_all;
 		_passed = o._passed;
 		_failed = o._failed;
 		_skipped = o._skipped;
@@ -120,6 +125,8 @@ TestSuite& TestSuite::skip(const std::string& name, TestFn fn)
 
 TestSuite& TestSuite::before_each(TestFn fn) { _before_each = fn; return *this; }
 TestSuite& TestSuite::after_each(TestFn fn)  { _after_each = fn; return *this; }
+TestSuite& TestSuite::before_all(TestFn fn)  { _before_all = fn; return *this; }
+TestSuite& TestSuite::after_all(TestFn fn)   { _after_all = fn; return *this; }
 
 /* ── Run ───────────────────────────────────────────────────────────────── */
 
@@ -132,8 +139,12 @@ int TestSuite::run()
 
 	_print_header();
 
+	if (_before_all) _before_all(*this);
+
 	for (int i = 0; i < _test_count; ++i)
 		run_test(i);
+
+	if (_after_all) _after_all(*this);
 
 	_print_summary();
 	return _failed;

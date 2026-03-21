@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 00:00:00 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:25:43 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,8 @@ public:
 	TestSuite& skip(const std::string& name, TestFn fn);
 	TestSuite& before_each(TestFn fn);
 	TestSuite& after_each(TestFn fn);
+	TestSuite& before_all(TestFn fn);
+	TestSuite& after_all(TestFn fn);
 
 	/* Run */
 	int  run();
@@ -130,6 +132,8 @@ private:
 	int         _result_count;
 	TestFn      _before_each;
 	TestFn      _after_each;
+	TestFn      _before_all;
+	TestFn      _after_all;
 	int         _passed;
 	int         _failed;
 	int         _skipped;
