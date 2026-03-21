@@ -24,7 +24,7 @@ public:
     }
 
     void addTransition(const TState& startState, const TState& finalState,
-                       const std::function<void()>& lambda)
+                       const std::function<void()>& lambda = nullptr)
     {
         _transitions[std::make_pair(startState, finalState)] = lambda;
     }
@@ -41,7 +41,8 @@ public:
             auto it = _transitions.find(key);
             if (it == _transitions.end())
                 throw std::runtime_error("StateMachine: undefined transition");
-            it->second();
+            if (it->second)
+                it->second();
         }
         if (_states.find(state) == _states.end())
             throw std::runtime_error("StateMachine: unknown state");
