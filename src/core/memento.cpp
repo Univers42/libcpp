@@ -31,10 +31,10 @@ void Memento::pushHistory()
 
 bool Memento::undo()
 {
-    if (_historyPos == 0)
+    if (_historyPos <= 1)
         return false;
     --_historyPos;
-    load(_history[_historyPos]);
+    load(_history[_historyPos - 1]);
     return true;
 }
 
