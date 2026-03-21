@@ -30,7 +30,7 @@
 # include "libcpp/core/observer.hpp"
 # include "libcpp/core/singleton.hpp"
 # include "libcpp/core/state_machine.hpp"
-// # include "libcpp/core/observable_value.hpp"
+# include "libcpp/core/observable_value.hpp"
 
 /* ── term ──────────────────────────────────────────────────────────────── */
 # include "libcpp/term/color.hpp"
