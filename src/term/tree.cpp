@@ -58,6 +58,25 @@ TreeNode& TreeNode::child(const TreeNode& node)
 	return children.back();
 }
 
+int TreeNode::depth() const
+{
+	int max_d = 0;
+	for (std::size_t i = 0; i < children.size(); ++i)
+	{
+		int d = children[i].depth() + 1;
+		if (d > max_d) max_d = d;
+	}
+	return max_d;
+}
+
+int TreeNode::count() const
+{
+	int n = 1;
+	for (std::size_t i = 0; i < children.size(); ++i)
+		n += children[i].count();
+	return n;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
  *  TreeStyle
  * ═════════════════════════════════════════════════════════════════════════ */
@@ -128,6 +147,8 @@ void TreeRenderer::print(const TreeNode& root) const
 {
 	std::cout << render(root);
 }
+
+void TreeRenderer::set_style(const TreeStyle& s) { _style = s; }
 
 static void _json_escape(std::ostringstream& out, const std::string& s)
 {

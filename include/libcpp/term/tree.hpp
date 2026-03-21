@@ -46,6 +46,8 @@ public:
 	/* ── builder API ───────────────────────────────────────────── */
 	TreeNode& add(const std::string& lbl, const std::string& det = "");
 	TreeNode& child(const TreeNode& node);
+	int       depth() const;
+	int       count() const;
 };
 
 /*
@@ -84,6 +86,7 @@ public:
 	std::string render(const TreeNode& root) const;
 	std::string to_json(const TreeNode& root) const;
 	void print(const TreeNode& root) const;
+	void set_style(const TreeStyle& s);
 
 private:
 	TreeStyle _style;
