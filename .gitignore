@@ -1,0 +1,17 @@
+# Build artifacts
+*.o
+*.a
+obj/
+
+# Binaries
+test_runner
+demo_runner
+
+# Snapshot files
+__snapshots__/
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
