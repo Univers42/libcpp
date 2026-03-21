@@ -121,6 +121,23 @@ public:
 		return fn();
 	}
 
+	/* ── and_then: flatMap — call fn that returns Option<U> ──── */
+	template<typename U>
+	Option<U> and_then(Option<U> (*fn)(const T&)) const
+	{
+		if (_has_value)
+			return fn(_storage.val);
+		return Option<U>::none();
+	}
+
+	/* ── filter: keep value only if predicate is true ─────────── */
+	Option filter(bool (*pred)(const T&)) const
+	{
+		if (_has_value && pred(_storage.val))
+			return *this;
+		return none();
+	}
+
 private:
 	union Storage
 	{
