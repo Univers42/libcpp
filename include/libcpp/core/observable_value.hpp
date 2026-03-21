@@ -11,6 +11,7 @@
 namespace libcpp {
 namespace core {
 
+/// @brief Observable value that notifies subscribers on change.
 template <typename TType>
 class ObservableValue {
 public:

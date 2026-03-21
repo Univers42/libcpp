@@ -14,10 +14,12 @@
 namespace libcpp {
 namespace data {
 
+/// @brief Fixed-size object pool with RAII handle (move-only).
+/// Acquires objects via placement-new and returns them automatically.
 template <typename TType>
 class Pool {
 public:
-    // ── Pool::Object — RAII handle (move-only) ──────────────────────────
+    /// @brief RAII handle to a pool-managed object. Move-only.
     template <typename T>
     class Object {
     public:

@@ -11,6 +11,8 @@
 namespace libcpp {
 namespace core {
 
+/// @brief Abstract Memento base class with undo/redo history.
+/// Subclass and implement _saveToSnapshot / _loadFromSnapshot.
 class Memento {
 public:
     using Snapshot = data::DataBuffer;

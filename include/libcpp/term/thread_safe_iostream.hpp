@@ -11,6 +11,7 @@
 
 namespace libcpp {
 
+/// @brief Thread-safe output stream with per-thread prefix and atomic flush.
 class ThreadSafeIOStream {
 public:
     ThreadSafeIOStream() = default;

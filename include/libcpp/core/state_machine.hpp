@@ -12,6 +12,7 @@
 namespace libcpp {
 namespace core {
 
+/// @brief Finite state machine with transition callbacks and per-state actions.
 template <typename TState>
 class StateMachine {
 public:

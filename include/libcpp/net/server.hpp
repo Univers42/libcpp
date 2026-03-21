@@ -16,6 +16,7 @@
 namespace libcpp {
 namespace net {
 
+/// @brief TCP server with per-client threads and message dispatch.
 class Server {
 public:
     using ClientId = uint64_t;

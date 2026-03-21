@@ -12,6 +12,7 @@
 namespace libcpp {
 namespace net {
 
+/// @brief TCP client using POSIX sockets with length-prefix framing.
 class Client {
 public:
     Client();

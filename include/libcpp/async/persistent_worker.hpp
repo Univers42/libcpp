@@ -15,6 +15,7 @@
 namespace libcpp {
 namespace async {
 
+/// @brief Named persistent worker that cycles through registered tasks.
 class PersistentWorker {
 public:
     explicit PersistentWorker(const std::string& name);

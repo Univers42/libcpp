@@ -16,6 +16,7 @@ namespace net {
 
 using MessageType = uint64_t;
 
+/// @brief Typed message with DataBuffer payload for network serialization.
 class Message {
 public:
     Message() = default;
@@ -43,6 +44,7 @@ private:
 };
 
 // ── MessageConsumer: type-to-callback dispatcher ──────────────────────────
+/// @brief Routes incoming messages to registered type-specific handlers.
 class MessageConsumer {
 public:
     MessageConsumer() = default;

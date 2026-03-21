@@ -8,6 +8,7 @@
 namespace libcpp {
 namespace util {
 
+/// @brief High-resolution chronometer with pause/resume accumulation.
 class Chronometer {
 public:
     Chronometer();

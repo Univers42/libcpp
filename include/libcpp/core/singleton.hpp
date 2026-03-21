@@ -10,6 +10,8 @@
 namespace libcpp {
 namespace core {
 
+/// @brief Singleton pattern — ensures exactly one instance of TType.
+/// Managed class should declare Singleton<T> as friend.
 template <typename TType>
 class Singleton {
 public:

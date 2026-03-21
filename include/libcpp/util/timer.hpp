@@ -12,6 +12,7 @@
 namespace libcpp {
 namespace util {
 
+/// @brief Callback-based timer (setTimeout / setInterval) with background thread.
 class Timer {
 public:
     Timer();

@@ -12,6 +12,7 @@
 namespace libcpp {
 namespace async {
 
+/// @brief Thread pool pulling jobs from a shared ThreadSafeQueue.
 class WorkerPool {
 public:
     explicit WorkerPool(size_t workerCount);

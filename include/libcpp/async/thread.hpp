@@ -12,6 +12,7 @@
 namespace libcpp {
 namespace async {
 
+/// @brief Named thread wrapper with callback and threadSafeCout prefix.
 class Thread {
 public:
     Thread();

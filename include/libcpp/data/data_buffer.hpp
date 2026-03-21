@@ -15,6 +15,9 @@
 namespace libcpp {
 namespace data {
 
+/// @brief Polymorphic byte container for serialization.
+/// Stores trivially-copyable types and strings in a flat byte buffer.
+/// Used by Memento::Snapshot and Message payload.
 class DataBuffer {
 public:
     DataBuffer() = default;

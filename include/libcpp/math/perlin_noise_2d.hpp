@@ -10,6 +10,7 @@
 namespace libcpp {
 namespace math {
 
+/// @brief Classic 2D Perlin noise generator with octave layering.
 class PerlinNoise2D {
 public:
     explicit PerlinNoise2D(uint64_t seed);

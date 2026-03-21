@@ -13,6 +13,7 @@
 namespace libcpp {
 namespace async {
 
+/// @brief Thread-safe deque with blocking and non-blocking pop.
 template <typename TType>
 class ThreadSafeQueue {
 public:

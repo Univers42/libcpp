@@ -12,6 +12,8 @@
 namespace libcpp {
 namespace core {
 
+/// @brief Observer pattern — subscribe lambdas to events, notify all.
+/// Thread-safe via std::mutex.
 template <typename TEvent>
 class Observer {
 public:

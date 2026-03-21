@@ -7,6 +7,7 @@
 namespace libcpp {
 namespace math {
 
+/// @brief 2D integer vector with arithmetic, dot, cross, and length.
 struct IVector2 {
     int x = 0;
     int y = 0;

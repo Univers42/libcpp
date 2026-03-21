@@ -11,6 +11,7 @@
 namespace libcpp {
 namespace math {
 
+/// @brief Generates unique random 2D integer coordinates in a bounding box.
 class Random2DCoordinateGenerator {
 public:
     // Seed the generator and define the bounding rectangle
