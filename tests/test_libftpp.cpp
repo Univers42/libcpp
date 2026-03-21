@@ -22,6 +22,7 @@
 #include "libcpp/math/random_2d_coordinate_generator.hpp"
 #include "libcpp/math/perlin_noise_2d.hpp"
 #include "libcpp/util/chronometer.hpp"
+#include "libcpp/util/timer.hpp"
 #include <atomic>
 #include <string>
 #include <thread>
@@ -387,6 +388,113 @@ static void test_random2d_exhaust(libcpp::test::TestSuite& s)
     ASSERT_TRUE(s, threw);
 }
 
+/* ── Pool move semantics ────────────────────────────────────────────────── */
+
+static void test_pool_object_move(libcpp::test::TestSuite& s)
+{
+    libcpp::data::Pool<int> pool;
+    pool.resize(2);
+    auto a = pool.acquire(42);
+    ASSERT_EQ(s, pool.available(), static_cast<size_t>(1));
+    auto b = std::move(a);                // move-construct
+    ASSERT_EQ(s, *b, 42);
+    ASSERT_EQ(s, pool.available(), static_cast<size_t>(1)); // still 1 slot used
+    {
+        auto c = pool.acquire(99);
+        b = std::move(c);                 // move-assign (releases old slot)
+    }
+    ASSERT_EQ(s, *b, 99);
+    ASSERT_EQ(s, pool.available(), static_cast<size_t>(1)); // one released via move-assign
+}
+
+/* ── Observer unsubscribe ───────────────────────────────────────────────── */
+
+static void test_observer_unsubscribe(libcpp::test::TestSuite& s)
+{
+    libcpp::core::Observer<int> obs;
+    int count = 0;
+    auto id = obs.subscribe(1, [&]() { count++; });
+    obs.notify(1);
+    ASSERT_EQ(s, count, 1);
+    obs.unsubscribe(1, id);
+    obs.notify(1);
+    ASSERT_EQ(s, count, 1);  // should not fire again
+    ASSERT_EQ(s, obs.listenerCount(1), static_cast<size_t>(0));
+}
+
+/* ── Singleton double-instantiate ───────────────────────────────────────── */
+
+static void test_singleton_double(libcpp::test::TestSuite& s)
+{
+    using S = libcpp::core::Singleton<SingletonTest>;
+    if (S::isInstantiated()) S::destroy();
+    S::instantiate(1);
+    bool threw = false;
+    try { S::instantiate(2); }
+    catch (const std::runtime_error&) { threw = true; }
+    ASSERT_TRUE(s, threw);
+    S::destroy();
+}
+
+/* ── StateMachine invalid transition ────────────────────────────────────── */
+
+static void test_statemachine_invalid(libcpp::test::TestSuite& s)
+{
+    libcpp::core::StateMachine<GameState> sm;
+    sm.addState(GameState::Menu);
+    sm.addState(GameState::Play);
+    sm.addTransition(GameState::Menu, GameState::Play);
+    sm.transitionTo(GameState::Menu);
+    // No transition from Menu → Pause
+    sm.addState(GameState::Pause);
+    bool threw = false;
+    try { sm.transitionTo(GameState::Pause); }
+    catch (const std::runtime_error&) { threw = true; }
+    ASSERT_TRUE(s, threw);
+}
+
+/* ── Timer setTimeout ───────────────────────────────────────────────────── */
+
+static void test_timer_timeout(libcpp::test::TestSuite& s)
+{
+    std::atomic<bool> fired{false};
+    libcpp::util::Timer timer;
+    timer.setTimeout([&]() { fired = true; },
+                     std::chrono::milliseconds(10));
+    ASSERT_TRUE(s, timer.isRunning());
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    ASSERT_TRUE(s, fired.load());
+    ASSERT_TRUE(s, !timer.isRunning());
+}
+
+/* ── Timer setInterval ──────────────────────────────────────────────────── */
+
+static void test_timer_interval(libcpp::test::TestSuite& s)
+{
+    std::atomic<int> ticks{0};
+    libcpp::util::Timer timer;
+    timer.setInterval([&]() { ticks++; },
+                      std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(std::chrono::milliseconds(55));
+    timer.stop();
+    ASSERT_TRUE(s, ticks.load() >= 3);
+    ASSERT_TRUE(s, !timer.isRunning());
+}
+
+/* ── DataBuffer setRaw ──────────────────────────────────────────────────── */
+
+static void test_databuffer_setraw(libcpp::test::TestSuite& s)
+{
+    libcpp::data::DataBuffer src;
+    src << 42 << std::string("raw");
+    libcpp::data::DataBuffer dst;
+    dst.setRaw(src.raw().data(), src.size());
+    int val = 0; std::string str;
+    dst >> val >> str;
+    ASSERT_EQ(s, val, 42);
+    ASSERT_EQ_STR(s, str, "raw");
+}
+
 /* ── Suite runner ───────────────────────────────────────────────────────── */
 
 void run_libftpp_tests(void)
@@ -432,6 +540,15 @@ void run_libftpp_tests(void)
     s.test("IVector2::div_zero", test_ivector2_division);
     s.test("PerlinNoise2D::octave", test_perlin_octave);
     s.test("Random2D::exhaust", test_random2d_exhaust);
+
+    // Extended coverage
+    s.test("Pool::Object_move", test_pool_object_move);
+    s.test("Observer::unsubscribe", test_observer_unsubscribe);
+    s.test("Singleton::double_instantiate", test_singleton_double);
+    s.test("StateMachine::invalid_transition", test_statemachine_invalid);
+    s.test("Timer::setTimeout", test_timer_timeout);
+    s.test("Timer::setInterval", test_timer_interval);
+    s.test("DataBuffer::setRaw", test_databuffer_setraw);
 
     s.run();
 }
