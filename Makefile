@@ -11,29 +11,15 @@
 # ══════════════════════════════════════════════════════════════════════════════
 
 CXX      = c++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Werror
+CXXFLAGS = -std=c++98 -Wall -Wextra -Werror -Iinclude
 AR       = ar rcs
 
 NAME     = libcpp.a
 OBJ_DIR  = obj
 
-# Every .cpp in this directory is part of the library
-SRC = Decorator.cpp \
-      VerboseDecorator.cpp \
-      ColorDecorator.cpp \
-      Srgb.cpp \
-      TermUtils.cpp \
-      TermStyle.cpp \
-      TermConf.cpp \
-      TermTable.cpp \
-      TermWriter.cpp \
-      LeakGuard.cpp \
-      postman.cpp \
-      assertion.cpp \
-      log.cpp \
-      ft_string.cpp
-
-OBJ = $(addprefix $(OBJ_DIR)/,$(SRC:.cpp=.o))
+# All .cpp files under src/
+SRC = $(shell find src -name '*.cpp')
+OBJ = $(patsubst src/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 # Colors
 RESET  = \033[0m
@@ -51,9 +37,10 @@ $(NAME): $(OBJ)
 	@$(AR) $@ $(OBJ)
 	@printf "  $(GREEN)●$(RESET) $(BOLD)$(NAME)$(RESET) $(DIM)archived ($(words $(OBJ)) objects)$(RESET)\n"
 
-$(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: src/%.cpp | $(OBJ_DIR)
+	@mkdir -p $(dir $@)
 	@printf "  $(DIM)compiling$(RESET)    $(CYAN)%-30s$(RESET)\n" "$(notdir $<)"
-	@$(CXX) $(CXXFLAGS) -I. -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJ_DIR):
 	@mkdir -p $@
