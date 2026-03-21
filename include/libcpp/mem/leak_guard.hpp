@@ -72,6 +72,8 @@ public:
 	static int  total_delete_calls();
 	static int  double_free_count();
 	static int  wild_free_count();
+	static std::size_t peak_memory();
+	static std::size_t current_memory();
 	static void report_leaks();
 	static void report_leaks_since_snapshot();
 	static void reset();
@@ -94,6 +96,8 @@ private:
 	static int       _total_delete;
 	static int       _double_frees;
 	static int       _wild_frees;
+	static std::size_t _current_mem;
+	static std::size_t _peak_mem;
 
 	static int find_slot(void* ptr);
 	static int free_slot();

@@ -34,6 +34,8 @@ int      LeakGuard::_total_new       = 0;
 int      LeakGuard::_total_delete    = 0;
 int      LeakGuard::_double_frees    = 0;
 int      LeakGuard::_wild_frees      = 0;
+std::size_t LeakGuard::_current_mem  = 0;
+std::size_t LeakGuard::_peak_mem     = 0;
 
 /* ── Lifecycle ─────────────────────────────────────────────────────────── */
 
@@ -60,6 +62,8 @@ void LeakGuard::reset()
 	_total_delete    = 0;
 	_double_frees    = 0;
 	_wild_frees      = 0;
+	_current_mem     = 0;
+	_peak_mem        = 0;
 }
 
 /* ── Ledger helpers ────────────────────────────────────────────────────── */
@@ -119,6 +123,8 @@ void LeakGuard::record_new(void* ptr, std::size_t size)
 	_ledger[idx].seq_id = _seq_counter;
 	_ledger[idx].active = true;
 	++_count;
+	_current_mem += size;
+	if (_current_mem > _peak_mem) _peak_mem = _current_mem;
 }
 
 int LeakGuard::record_delete(void* ptr)
@@ -130,6 +136,7 @@ int LeakGuard::record_delete(void* ptr)
 
 	if (raw >= 0)
 	{
+		_current_mem -= _ledger[raw].size;
 		_ledger[raw].active = false;
 		--_count;
 		return 0;
@@ -213,6 +220,8 @@ int LeakGuard::total_new_calls()    { return _total_new; }
 int LeakGuard::total_delete_calls() { return _total_delete; }
 int LeakGuard::double_free_count()  { return _double_frees; }
 int LeakGuard::wild_free_count()    { return _wild_frees; }
+std::size_t LeakGuard::peak_memory()    { return _peak_mem; }
+std::size_t LeakGuard::current_memory() { return _current_mem; }
 
 static void _print_record(const LgRecord& r)
 {
