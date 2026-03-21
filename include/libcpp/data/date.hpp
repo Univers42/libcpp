@@ -48,6 +48,8 @@ public:
 	/* Calendar helpers */
 	int  weekday() const;               /* 0=Sun … 6=Sat */
 	int  day_of_week() const;           /* alias for weekday() */
+	bool is_weekend() const;
+	bool is_weekday() const;
 	std::string weekday_name() const;
 	std::string weekday_short() const;
 	std::string month_name() const;

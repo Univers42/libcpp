@@ -112,6 +112,8 @@ int Date::weekday() const
 }
 
 int Date::day_of_week() const { return weekday(); }
+bool Date::is_weekend() const { int w = weekday(); return w == 0 || w == 6; }
+bool Date::is_weekday() const { return !is_weekend(); }
 
 std::string Date::weekday_name() const
 {
