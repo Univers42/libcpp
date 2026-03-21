@@ -128,6 +128,7 @@ public:
 
 	/* Mutation */
 	void add_row(const CsvRow& r);
+	void remove_row(std::size_t index);
 	void add_column(const std::string& name);
 	void set_headers(const std::vector<std::string>& h);
 	void clear();

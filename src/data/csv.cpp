@@ -378,6 +378,12 @@ int CsvDocument::get_column_index(const std::string& name) const
 
 void CsvDocument::add_row(const CsvRow& r) { _rows.push_back(r); }
 
+void CsvDocument::remove_row(std::size_t index)
+{
+	if (index < _rows.size())
+		_rows.erase(_rows.begin() + static_cast<std::ptrdiff_t>(index));
+}
+
 void CsvDocument::add_column(const std::string& name)
 {
 	_headers.push_back(name);
