@@ -24,7 +24,7 @@ libcpp/
 │   ├── math/                # IVector2, IVector3, Random2D, PerlinNoise2D
 │   └── libcpp.hpp           # master include
 ├── src/                     # implementation files (mirrors include/)
-├── tests/                   # 75 integration tests
+├── tests/                   # 91 integration tests
 ├── demo/                    # demo programs
 ├── libftpp.hpp              # umbrella header (required by subject)
 └── Makefile                 # 42-compatible build
@@ -34,8 +34,9 @@ libcpp/
 
 ```bash
 make                 # builds libcpp.a + libftpp.a
-make test            # runs 75 integration tests
+make test            # runs 91 integration tests
 make demo            # builds and runs libftpp demo
+make stats           # prints codebase metrics
 make re              # clean rebuild
 ```
 
