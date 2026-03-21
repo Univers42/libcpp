@@ -49,15 +49,15 @@ int main()
     ed.text = "first";  ed.pushHistory();
     ed.text = "second"; ed.pushHistory();
     std::cout << "  current: " << ed.text << "\n";
-    ed.undo();
+    (void)ed.undo();
     std::cout << "  undo:    " << ed.text << "\n";
-    ed.redo();
+    (void)ed.redo();
     std::cout << "  redo:    " << ed.text << "\n\n";
 
     // ── 4. Observer ─────────────────────────────────────────────────────
     std::cout << "--- Observer ---\n";
     libcpp::core::Observer<std::string> obs;
-    obs.subscribe("click", [](){ std::cout << "  click handler fired!\n"; });
+    (void)obs.subscribe("click", [](){ std::cout << "  click handler fired!\n"; });
     obs.notify("click");
     std::cout << "\n";
 
