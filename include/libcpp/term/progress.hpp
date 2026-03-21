@@ -67,6 +67,10 @@ public:
 	double percent() const;
 	double rate() const;
 	double eta_seconds() const;
+	bool   is_complete() const;
+	std::size_t current() const;
+	std::size_t total() const;
+	void   set_width(int w);
 
 	/* ── output ────────────────────────────────────────────────── */
 	std::string render() const;

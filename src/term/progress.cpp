@@ -112,6 +112,11 @@ double ProgressBar::eta_seconds() const
 	return (_total - _current) / r;
 }
 
+bool ProgressBar::is_complete() const { return _current >= _total; }
+std::size_t ProgressBar::current() const { return _current; }
+std::size_t ProgressBar::total() const { return _total; }
+void ProgressBar::set_width(int w) { _style.width = w; }
+
 std::string ProgressBar::render() const
 {
 	std::ostringstream out;
