@@ -39,7 +39,7 @@
 # include "libcpp/term/tree.hpp"
 # include "libcpp/term/progress.hpp"
 # include "libcpp/term/writer.hpp"
-// # include "libcpp/term/thread_safe_iostream.hpp"
+# include "libcpp/term/thread_safe_iostream.hpp"
 
 /* ── log ───────────────────────────────────────────────────────────────── */
 # include "libcpp/log/logger.hpp"
@@ -76,10 +76,10 @@
 # include "libcpp/data/data_buffer.hpp"
 
 /* ── async ─────────────────────────────────────────────────────────────── */
-// # include "libcpp/async/thread_safe_queue.hpp"
-// # include "libcpp/async/thread.hpp"
-// # include "libcpp/async/worker_pool.hpp"
-// # include "libcpp/async/persistent_worker.hpp"
+# include "libcpp/async/thread_safe_queue.hpp"
+# include "libcpp/async/thread.hpp"
+# include "libcpp/async/worker_pool.hpp"
+# include "libcpp/async/persistent_worker.hpp"
 
 /* ── net ───────────────────────────────────────────────────────────────── */
 // # include "libcpp/net/message.hpp"
