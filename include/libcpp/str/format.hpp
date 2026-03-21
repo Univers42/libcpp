@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 00:00:00 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:04:25 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ bool        starts_with(const std::string& s, const std::string& prefix);
 bool        ends_with(const std::string& s, const std::string& suffix);
 std::string replace_all(const std::string& s, const std::string& from,
 						const std::string& to);
+bool        contains(const std::string& s, const std::string& sub);
 
 /* ── Message — streamable string builder (replaces old message.hpp) ────── */
 

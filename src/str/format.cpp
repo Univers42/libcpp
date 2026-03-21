@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 00:00:00 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:04:26 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,11 @@ std::string replace_all(const std::string& s, const std::string& from,
 	}
 	result += s.substr(prev);
 	return result;
+}
+
+bool contains(const std::string& s, const std::string& sub)
+{
+	return s.find(sub) != std::string::npos;
 }
 
 /* ── Message ───────────────────────────────────────────────────────────── */
