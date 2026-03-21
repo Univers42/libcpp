@@ -76,4 +76,13 @@ demo: $(NAME)
 	@$(CXX) $(CXXFLAGS) -I. $(DEMO_SRC) -L. -lcpp -o $(DEMO_BIN)
 	@./$(DEMO_BIN)
 
-.PHONY: all clean fclean re test demo
+# ── Stats ────────────────────────────────────────────────────────────────────
+
+stats:
+	@printf "  $(BOLD)lib objects $(RESET) $(YELLOW)$(words $(OBJ))$(RESET)\n"
+	@printf "  $(BOLD)headers     $(RESET) $(YELLOW)%s$(RESET)\n" "$$(find include -name '*.hpp' | wc -l)"
+	@printf "  $(BOLD)source files$(RESET) $(YELLOW)%s$(RESET)\n" "$$(find src -name '*.cpp' | wc -l)"
+	@printf "  $(BOLD)test files  $(RESET) $(YELLOW)%s$(RESET)\n" "$$(find tests -name '*.cpp' | wc -l)"
+	@printf "  $(BOLD)total lines $(RESET) $(YELLOW)%s$(RESET)\n" "$$(find include src tests -name '*.hpp' -o -name '*.cpp' | xargs wc -l | tail -1 | awk '{print $$1}')"
+
+.PHONY: all clean fclean re test demo stats
