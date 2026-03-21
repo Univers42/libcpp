@@ -29,10 +29,10 @@ struct IVector3 {
     bool operator==(const IVector3& rhs) const;
     bool operator!=(const IVector3& rhs) const;
 
-    int      dot(const IVector3& rhs) const;
-    IVector3 cross(const IVector3& rhs) const;
-    double   length() const;
-    int      lengthSquared() const;
+    [[nodiscard]] int      dot(const IVector3& rhs) const;
+    [[nodiscard]] IVector3 cross(const IVector3& rhs) const;
+    [[nodiscard]] double   length() const;
+    [[nodiscard]] int      lengthSquared() const;
 
     friend std::ostream& operator<<(std::ostream& os, const IVector3& v);
 };

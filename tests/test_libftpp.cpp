@@ -97,9 +97,9 @@ static void test_memento_undo_redo(libcpp::test::TestSuite& s)
     m.pushHistory();
     m.value = 20;
     m.pushHistory();
-    m.undo();
+    ASSERT_TRUE(s, m.undo());
     ASSERT_EQ(s, m.value, 10);
-    m.redo();
+    ASSERT_TRUE(s, m.redo());
     ASSERT_EQ(s, m.value, 20);
 }
 

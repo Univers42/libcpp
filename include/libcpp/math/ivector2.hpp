@@ -28,10 +28,10 @@ struct IVector2 {
     bool operator==(const IVector2& rhs) const;
     bool operator!=(const IVector2& rhs) const;
 
-    int dot(const IVector2& rhs) const;
-    int cross(const IVector2& rhs) const; // 2D cross product (scalar)
-    double length() const;
-    int lengthSquared() const;
+    [[nodiscard]] int dot(const IVector2& rhs) const;
+    [[nodiscard]] int cross(const IVector2& rhs) const; // 2D cross product (scalar)
+    [[nodiscard]] double length() const;
+    [[nodiscard]] int lengthSquared() const;
 
     friend std::ostream& operator<<(std::ostream& os, const IVector2& v);
 };

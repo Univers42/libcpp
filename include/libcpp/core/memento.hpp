@@ -24,9 +24,9 @@ public:
 
     // History management (undo/redo)
     void pushHistory();
-    bool undo();
-    bool redo();
-    size_t historySize() const;
+    [[nodiscard]] bool undo();
+    [[nodiscard]] bool redo();
+    [[nodiscard]] size_t historySize() const;
 
 private:
     virtual void _saveToSnapshot(Snapshot& snapshot) const = 0;
