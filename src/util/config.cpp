@@ -346,5 +346,27 @@ bool Config::remove(const std::string& section, const std::string& key)
 	return true;
 }
 
+std::string Config::to_string() const
+{
+	std::string result;
+	std::string cur_section;
+	for (int i = 0; i < _count; ++i)
+	{
+		if (_entries[i].section != cur_section)
+		{
+			cur_section = _entries[i].section;
+			if (!result.empty()) result += '\n';
+			result += '[';
+			result += cur_section;
+			result += "]\n";
+		}
+		result += _entries[i].key;
+		result += " = ";
+		result += _entries[i].value;
+		result += '\n';
+	}
+	return result;
+}
+
 } /* namespace util */
 } /* namespace libcpp */

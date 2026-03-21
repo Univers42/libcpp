@@ -87,6 +87,9 @@ public:
 	int  section_count() const;
 	bool remove(const std::string& section, const std::string& key);
 
+	/* Serialization */
+	std::string to_string() const;
+
 	/* Clear all entries */
 	void clear();
 
