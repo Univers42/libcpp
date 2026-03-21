@@ -119,6 +119,25 @@ void Benchmark::run()
 
 int Benchmark::result_count() const { return _result_count; }
 const BenchResult& Benchmark::result(int i) const { return _results[i]; }
+const std::string& Benchmark::name() const { return _name; }
+
+const BenchResult* Benchmark::fastest() const
+{
+	if (_result_count == 0) return 0;
+	const BenchResult* best = &_results[0];
+	for (int i = 1; i < _result_count; ++i)
+		if (_results[i].mean_ms < best->mean_ms) best = &_results[i];
+	return best;
+}
+
+const BenchResult* Benchmark::slowest() const
+{
+	if (_result_count == 0) return 0;
+	const BenchResult* worst = &_results[0];
+	for (int i = 1; i < _result_count; ++i)
+		if (_results[i].mean_ms > worst->mean_ms) worst = &_results[i];
+	return worst;
+}
 
 BenchResult Benchmark::_run_one(const BenchCase& bc)
 {

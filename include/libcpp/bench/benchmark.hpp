@@ -85,6 +85,9 @@ public:
 	/* Access results */
 	int                 result_count() const;
 	const BenchResult&  result(int i) const;
+	const std::string&  name() const;
+	const BenchResult*  fastest() const;
+	const BenchResult*  slowest() const;
 
 private:
 	std::string _name;
