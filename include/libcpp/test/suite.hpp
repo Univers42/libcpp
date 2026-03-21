@@ -116,6 +116,8 @@ public:
 	void assert_neq_int(long a, long b, const char* file, int line);
 	void assert_lt(long a, long b, const char* file, int line);
 	void assert_gt(long a, long b, const char* file, int line);
+	void assert_le(long a, long b, const char* file, int line);
+	void assert_ge(long a, long b, const char* file, int line);
 
 	/* Accessors */
 	int           total() const;
@@ -171,6 +173,14 @@ private:
 
 # define ASSERT_GT(suite, a, b) \
 	(suite).assert_gt(static_cast<long>(a), static_cast<long>(b), \
+					  __FILE__, __LINE__)
+
+# define ASSERT_LE(suite, a, b) \
+	(suite).assert_le(static_cast<long>(a), static_cast<long>(b), \
+					  __FILE__, __LINE__)
+
+# define ASSERT_GE(suite, a, b) \
+	(suite).assert_ge(static_cast<long>(a), static_cast<long>(b), \
 					  __FILE__, __LINE__)
 
 } /* namespace test */

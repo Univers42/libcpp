@@ -283,6 +283,26 @@ void TestSuite::assert_gt(long a, long b, const char* file, int line)
 	}
 }
 
+void TestSuite::assert_le(long a, long b, const char* file, int line)
+{
+	if (!(a <= b))
+	{
+		std::ostringstream oss;
+		oss << "expected " << a << " <= " << b;
+		throw AssertError(oss.str(), file, line);
+	}
+}
+
+void TestSuite::assert_ge(long a, long b, const char* file, int line)
+{
+	if (!(a >= b))
+	{
+		std::ostringstream oss;
+		oss << "expected " << a << " >= " << b;
+		throw AssertError(oss.str(), file, line);
+	}
+}
+
 /* ── Accessors ─────────────────────────────────────────────────────────── */
 
 int TestSuite::total()   const { return _test_count; }
