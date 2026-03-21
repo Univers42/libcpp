@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 21:37:34 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:39:26 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ public:
 	void assert_ge(long a, long b, const char* file, int line);
 
 	/* Accessors */
+	int           test_count() const;
 	int           total() const;
 	int           passed() const;
 	int           failed() const;

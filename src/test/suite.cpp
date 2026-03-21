@@ -305,6 +305,7 @@ void TestSuite::assert_ge(long a, long b, const char* file, int line)
 
 /* ── Accessors ─────────────────────────────────────────────────────────── */
 
+int TestSuite::test_count() const { return _test_count; }
 int TestSuite::total()   const { return _test_count; }
 int TestSuite::passed()  const { return _passed; }
 int TestSuite::failed()  const { return _failed; }
