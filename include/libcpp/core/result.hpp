@@ -158,6 +158,23 @@ public:
 		return Result<T, F>::err(fn(_storage.error));
 	}
 
+	/* ── and_then: flatMap — chain operations that may fail ──── */
+	template<typename U>
+	Result<U, E> and_then(Result<U, E> (*fn)(const T&)) const
+	{
+		if (_is_ok)
+			return fn(_storage.val);
+		return Result<U, E>::err(_storage.error);
+	}
+
+	/* ── or_else: recover from an error ───────────────────────── */
+	Result or_else(Result (*fn)(const E&)) const
+	{
+		if (_is_ok)
+			return *this;
+		return fn(_storage.error);
+	}
+
 private:
 	union Storage
 	{
