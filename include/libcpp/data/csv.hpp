@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 00:00:00 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:09:54 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,8 @@ public:
 	bool load(const std::string& path, const CsvOptions& opt = CsvOptions());
 	bool load_stream(std::istream& in, const CsvOptions& opt = CsvOptions());
 	bool save(const std::string& path, const CsvOptions& opt = CsvOptions()) const;
+	bool save_stream(std::ostream& out, const CsvOptions& opt = CsvOptions()) const;
+	std::string to_string(const CsvOptions& opt = CsvOptions()) const;
 
 	/* Accessors */
 	const std::vector<CsvRow>&         rows() const;

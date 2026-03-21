@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 00:00:00 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:09:54 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -328,28 +328,39 @@ bool CsvDocument::save(const std::string& path, const CsvOptions& opt) const
 	std::ofstream ofs(path.c_str());
 	if (!ofs.is_open())
 		return false;
+	return save_stream(ofs, opt);
+}
 
+bool CsvDocument::save_stream(std::ostream& out, const CsvOptions& opt) const
+{
 	if (opt.has_header && !_headers.empty())
 	{
 		for (std::size_t i = 0; i < _headers.size(); ++i)
 		{
-			ofs << _escape_field(_headers[i], opt);
+			out << _escape_field(_headers[i], opt);
 			if (i + 1 < _headers.size())
-				ofs << opt.delimiter;
+				out << opt.delimiter;
 		}
-		ofs << "\n";
+		out << "\n";
 	}
 	for (std::size_t r = 0; r < _rows.size(); ++r)
 	{
 		for (std::size_t i = 0; i < _rows[r].size(); ++i)
 		{
-			ofs << _escape_field(_rows[r][i], opt);
+			out << _escape_field(_rows[r][i], opt);
 			if (i + 1 < _rows[r].size())
-				ofs << opt.delimiter;
+				out << opt.delimiter;
 		}
-		ofs << "\n";
+		out << "\n";
 	}
 	return true;
+}
+
+std::string CsvDocument::to_string(const CsvOptions& opt) const
+{
+	std::ostringstream oss;
+	save_stream(oss, opt);
+	return oss.str();
 }
 
 const std::vector<CsvRow>&      CsvDocument::rows() const      { return _rows; }
