@@ -29,7 +29,7 @@ public:
     static void instantiate(TArgs&&... p_args)
     {
         if (_instance)
-            throw std::runtime_error("Singleton already instantiated");
+            throw std::runtime_error("Singleton: already instantiated");
         _instance = std::unique_ptr<TType>(
             new TType(std::forward<TArgs>(p_args)...));
     }
