@@ -59,15 +59,9 @@ Message Message::deserialize(const uint8_t* data, size_t len)
     if (len < headerSize + payloadSize)
         throw std::runtime_error("Message::deserialize: truncated payload");
 
-    // Load payload into the DataBuffer
-    if (payloadSize > 0) {
-        std::vector<uint8_t> payload(data + off, data + off + payloadSize);
-        // Write raw bytes through operator<< for each byte? No — just set raw.
-        // DataBuffer doesn't expose a raw-set, so we stream in blocks.
-        // Actually let's just push raw bytes directly
-        for (uint32_t i = 0; i < payloadSize; ++i)
-            msg._payload << payload[i];
-    }
+    // Load payload into the DataBuffer efficiently
+    if (payloadSize > 0)
+        msg._payload.setRaw(data + off, payloadSize);
     msg._payload.resetCursor();
     return msg;
 }

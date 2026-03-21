@@ -45,5 +45,16 @@ const std::vector<char>& DataBuffer::raw() const { return _data; }
 void   DataBuffer::resetCursor() { _readCursor = 0; }
 size_t DataBuffer::cursor() const { return _readCursor; }
 
+void DataBuffer::setRaw(const char* data, size_t size)
+{
+    _data.assign(data, data + size);
+    _readCursor = 0;
+}
+
+void DataBuffer::setRaw(const uint8_t* data, size_t size)
+{
+    setRaw(reinterpret_cast<const char*>(data), size);
+}
+
 } // namespace data
 } // namespace libcpp

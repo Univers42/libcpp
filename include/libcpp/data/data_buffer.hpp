@@ -5,6 +5,7 @@
 // Used as the foundation for Memento::Snapshot and Message payload.
 
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <stdexcept>
 #include <string>
@@ -57,6 +58,10 @@ public:
     bool   empty() const;
     void   clear();
     const std::vector<char>& raw() const;
+
+    // ── Raw import (for network deserialization) ────────────────────
+    void setRaw(const char* data, size_t size);
+    void setRaw(const uint8_t* data, size_t size);
 
     // ── Read cursor control ─────────────────────────────────────────
     void   resetCursor();
