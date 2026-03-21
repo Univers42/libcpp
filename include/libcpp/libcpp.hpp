@@ -26,11 +26,10 @@
 # include "libcpp/core/signal.hpp"
 # include "libcpp/core/property.hpp"
 # include "libcpp/core/arena.hpp"
-// New libftpp design patterns (included once headers exist):
-// # include "libcpp/core/memento.hpp"
-// # include "libcpp/core/observer.hpp"
-// # include "libcpp/core/singleton.hpp"
-// # include "libcpp/core/state_machine.hpp"
+# include "libcpp/core/memento.hpp"
+# include "libcpp/core/observer.hpp"
+# include "libcpp/core/singleton.hpp"
+# include "libcpp/core/state_machine.hpp"
 // # include "libcpp/core/observable_value.hpp"
 
 /* ── term ──────────────────────────────────────────────────────────────── */
@@ -74,8 +73,7 @@
 # include "libcpp/data/date.hpp"
 # include "libcpp/data/csv.hpp"
 # include "libcpp/data/database.hpp"
-// # include "libcpp/data/data_buffer.hpp"
-// # include "libcpp/data/pool.hpp"  (libftpp Pool, separate from mem::Pool)
+# include "libcpp/data/data_buffer.hpp"
 
 /* ── async ─────────────────────────────────────────────────────────────── */
 // # include "libcpp/async/thread_safe_queue.hpp"
