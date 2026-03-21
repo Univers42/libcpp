@@ -37,6 +37,7 @@ enum Level
 };
 
 const char* level_name(Level lv);
+std::string level_string(Level lv);
 Srgb level_color(Level lv);
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -63,6 +64,7 @@ public:
 
 	void log(Level level, const std::string& msg);
 	void set_min_level(Level lv);
+	Level min_level() const;
 
 private:
 	Level _min_level;

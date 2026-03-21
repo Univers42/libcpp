@@ -36,6 +36,8 @@ const char* level_name(Level lv)
 	return "???";
 }
 
+std::string level_string(Level lv) { return std::string(level_name(lv)); }
+
 Srgb level_color(Level lv)
 {
 	switch (lv)
@@ -82,6 +84,7 @@ void ConsoleLogger::log(Level level, const std::string& msg)
 }
 
 void ConsoleLogger::set_min_level(Level lv) { _min_level = lv; }
+Level ConsoleLogger::min_level() const { return _min_level; }
 
 /* ── FileLogger ────────────────────────────────────────────────────────── */
 
