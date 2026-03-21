@@ -317,6 +317,76 @@ static void test_chronometer(libcpp::test::TestSuite& s)
     ASSERT_TRUE(s, !chrono.isRunning());
 }
 
+/* ── Edge cases ─────────────────────────────────────────────────────────── */
+
+static void test_databuffer_multi(libcpp::test::TestSuite& s)
+{
+    libcpp::data::DataBuffer buf;
+    buf << 1 << 2 << 3 << std::string("abc");
+    buf.resetCursor();
+    int a, b, c; std::string str;
+    buf >> a >> b >> c >> str;
+    ASSERT_EQ(s, a, 1);
+    ASSERT_EQ(s, b, 2);
+    ASSERT_EQ(s, c, 3);
+    ASSERT_EQ_STR(s, str, "abc");
+}
+
+static void test_queue_throw_empty(libcpp::test::TestSuite& s)
+{
+    libcpp::async::ThreadSafeQueue<int> q;
+    bool threw = false;
+    try { q.pop_front(); }
+    catch (const std::runtime_error&) { threw = true; }
+    ASSERT_TRUE(s, threw);
+}
+
+static void test_memento_double_undo(libcpp::test::TestSuite& s)
+{
+    TestMemento m;
+    m.value = 10; m.pushHistory();
+    m.value = 20; m.pushHistory();
+    m.value = 30; m.pushHistory();
+    ASSERT_TRUE(s, m.undo());  // -> 20
+    ASSERT_EQ(s, m.value, 20);
+    ASSERT_TRUE(s, m.undo());  // -> 10
+    ASSERT_EQ(s, m.value, 10);
+    ASSERT_TRUE(s, !m.undo()); // can't go further
+}
+
+static void test_ivector2_division(libcpp::test::TestSuite& s)
+{
+    libcpp::math::IVector2 v(10, 20);
+    auto r = v / 2;
+    ASSERT_EQ(s, r.x, 5);
+    ASSERT_EQ(s, r.y, 10);
+    bool threw = false;
+    try { auto _ = v / 0; (void)_; }
+    catch (const std::runtime_error&) { threw = true; }
+    ASSERT_TRUE(s, threw);
+}
+
+static void test_perlin_octave(libcpp::test::TestSuite& s)
+{
+    libcpp::math::PerlinNoise2D noise(123);
+    double v = noise.octave(1.5, 2.5, 4, 0.5);
+    ASSERT_TRUE(s, v >= -1.0 && v <= 1.0);
+}
+
+static void test_random2d_exhaust(libcpp::test::TestSuite& s)
+{
+    libcpp::math::IVector2 min(0, 0);
+    libcpp::math::IVector2 max(0, 1);
+    libcpp::math::Random2DCoordinateGenerator gen(1, min, max);
+    ASSERT_EQ(s, gen.remaining(), static_cast<size_t>(2));
+    gen(); gen();  // exhaust
+    ASSERT_EQ(s, gen.remaining(), static_cast<size_t>(0));
+    bool threw = false;
+    try { gen(); }
+    catch (const std::runtime_error&) { threw = true; }
+    ASSERT_TRUE(s, threw);
+}
+
 /* ── Suite runner ───────────────────────────────────────────────────────── */
 
 void run_libftpp_tests(void)
@@ -354,6 +424,14 @@ void run_libftpp_tests(void)
 
     // Bonus
     s.test("Chronometer::timing", test_chronometer);
+
+    // Edge cases
+    s.test("DataBuffer::multi", test_databuffer_multi);
+    s.test("Queue::throw_empty", test_queue_throw_empty);
+    s.test("Memento::double_undo", test_memento_double_undo);
+    s.test("IVector2::div_zero", test_ivector2_division);
+    s.test("PerlinNoise2D::octave", test_perlin_octave);
+    s.test("Random2D::exhaust", test_random2d_exhaust);
 
     s.run();
 }
