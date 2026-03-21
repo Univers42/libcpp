@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 21:33:17 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:41:49 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ public:
 	/* Factory */
 	static Date today();
 	static Date parse(const std::string& str, const std::string& fmt = "YYYY-MM-DD");
+	static Date from_epoch(long seconds);
 
 	/* Accessors */
 	int year() const;
@@ -43,6 +44,7 @@ public:
 
 	/* Validation */
 	bool is_valid() const;
+	static bool is_leap_year(int y);
 
 	/* Calendar helpers */
 	int  weekday() const;               /* 0=Sun … 6=Sat */
@@ -63,6 +65,7 @@ public:
 	/* Formatting */
 	std::string to_string(const std::string& fmt = "YYYY-MM-DD") const;
 	std::string to_iso() const;
+	long to_epoch() const;
 
 	/* Comparison */
 	bool operator==(const Date& o) const;

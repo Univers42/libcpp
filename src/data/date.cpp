@@ -58,6 +58,13 @@ Date Date::today()
 	return Date(now->tm_year + 1900, now->tm_mon + 1, now->tm_mday);
 }
 
+Date Date::from_epoch(long seconds)
+{
+	std::time_t t = static_cast<std::time_t>(seconds);
+	std::tm* gm = std::gmtime(&t);
+	return Date(gm->tm_year + 1900, gm->tm_mon + 1, gm->tm_mday);
+}
+
 Date Date::parse(const std::string& str, const std::string& fmt)
 {
 	if (fmt == "YYYY-MM-DD" || fmt == "ISO")
@@ -228,6 +235,19 @@ std::string Date::to_iso() const
 		<< std::setw(2) << _month << "-"
 		<< std::setw(2) << _day;
 	return oss.str();
+}
+
+long Date::to_epoch() const
+{
+	struct std::tm t;
+	t.tm_year = _year - 1900;
+	t.tm_mon  = _month - 1;
+	t.tm_mday = _day;
+	t.tm_hour = 0;
+	t.tm_min  = 0;
+	t.tm_sec  = 0;
+	t.tm_isdst = -1;
+	return static_cast<long>(std::mktime(&t));
 }
 
 std::string Date::to_string(const std::string& fmt) const
