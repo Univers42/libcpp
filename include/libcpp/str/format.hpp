@@ -25,6 +25,7 @@ namespace str
 
 std::string to_string(int v);
 std::string to_string(long v);
+std::string to_string(unsigned int v);
 std::string to_string(unsigned long v);
 std::string to_string(double v);
 std::string to_string(const char* v);

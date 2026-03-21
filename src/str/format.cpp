@@ -22,6 +22,7 @@ namespace str
 
 std::string to_string(int v)          { std::ostringstream o; o << v; return o.str(); }
 std::string to_string(long v)         { std::ostringstream o; o << v; return o.str(); }
+std::string to_string(unsigned int v) { std::ostringstream o; o << v; return o.str(); }
 std::string to_string(unsigned long v){ std::ostringstream o; o << v; return o.str(); }
 std::string to_string(double v)       { std::ostringstream o; o << v; return o.str(); }
 std::string to_string(const char* v)  { return v ? std::string(v) : std::string("(null)"); }
