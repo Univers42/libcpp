@@ -99,6 +99,9 @@ std::string DbRow::get_value(const std::string& col) const
 	return (it != _data.end()) ? it->second : "";
 }
 
+bool DbRow::has_key(const std::string& col) const
+{ return _data.find(col) != _data.end(); }
+
 const std::map<std::string, std::string>& DbRow::data() const { return _data; }
 
 /* ── DbTable ────────────────────────────────────────────────────────────── */
@@ -114,6 +117,11 @@ DbTable::~DbTable() {}
 
 void DbTable::add_column(const DbColumn& c) { _columns.push_back(c); }
 void DbTable::add_row(const DbRow& r)       { _rows.push_back(r); }
+void DbTable::remove_row(std::size_t index)
+{
+	if (index < _rows.size())
+		_rows.erase(_rows.begin() + static_cast<std::ptrdiff_t>(index));
+}
 void DbTable::clear_rows()                   { _rows.clear(); }
 
 const std::vector<DbColumn>& DbTable::columns() const { return _columns; }
@@ -221,6 +229,16 @@ void Database::add_row(const std::map<std::string, std::string>& data)
 		 it != data.end(); ++it)
 		row.set_value(it->first, it->second);
 	_table.add_row(row);
+}
+
+void Database::remove_row(std::size_t index) { _table.remove_row(index); }
+
+void Database::update_cell(std::size_t row, const std::string& column,
+					   const std::string& value)
+{
+	std::vector<DbRow>& rows = _table.rows();
+	if (row < rows.size())
+		rows[row].set_value(column, value);
 }
 
 DbTable&       Database::table()       { return _table; }

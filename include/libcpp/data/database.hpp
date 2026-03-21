@@ -76,6 +76,7 @@ public:
 
 	void        set_value(const std::string& col, const std::string& val);
 	std::string get_value(const std::string& col) const;
+	bool        has_key(const std::string& col) const;
 
 	const std::map<std::string, std::string>& data() const;
 
@@ -95,6 +96,7 @@ public:
 
 	void add_column(const DbColumn& col);
 	void add_row(const DbRow& row);
+	void remove_row(std::size_t index);
 	void clear_rows();
 
 	const std::vector<DbColumn>& columns() const;
@@ -127,6 +129,9 @@ public:
 					ColType::Type type = ColType::STRING,
 					Align::Type align = Align::LEFT);
 	void add_row(const std::map<std::string, std::string>& data);
+	void remove_row(std::size_t index);
+	void update_cell(std::size_t row, const std::string& column,
+					 const std::string& value);
 
 	DbTable&       table();
 	const DbTable& table() const;
