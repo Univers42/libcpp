@@ -54,7 +54,7 @@ clean:
 	@rm -rf $(OBJ_DIR)
 
 fclean: clean
-	@rm -f $(NAME) $(FTNAME)
+	@rm -f $(NAME) $(FTNAME) $(TEST_BIN) $(DEMO_BIN)
 
 re: fclean all
 
