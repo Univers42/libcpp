@@ -146,17 +146,18 @@ FuzzResult::~FuzzResult() {}
 
 /* ── FuzzRunner ────────────────────────────────────────────────────────── */
 
-FuzzRunner::FuzzRunner() : _iterations(100), _seed(static_cast<unsigned long>(std::time(0))) {}
-FuzzRunner::FuzzRunner(const FuzzRunner& o) : _iterations(o._iterations), _seed(o._seed) {}
+FuzzRunner::FuzzRunner() : _iterations(100), _seed(static_cast<unsigned long>(std::time(0))), _max_failures(0) {}
+FuzzRunner::FuzzRunner(const FuzzRunner& o) : _iterations(o._iterations), _seed(o._seed), _max_failures(o._max_failures) {}
 FuzzRunner& FuzzRunner::operator=(const FuzzRunner& o)
 {
-	if (this != &o) { _iterations = o._iterations; _seed = o._seed; }
+	if (this != &o) { _iterations = o._iterations; _seed = o._seed; _max_failures = o._max_failures; }
 	return *this;
 }
 FuzzRunner::~FuzzRunner() {}
 
 FuzzRunner& FuzzRunner::iterations(int n) { _iterations = n; return *this; }
 FuzzRunner& FuzzRunner::seed(unsigned long s) { _seed = s; return *this; }
+FuzzRunner& FuzzRunner::max_failures(int n) { _max_failures = n; return *this; }
 
 FuzzResult FuzzRunner::run(FuzzPropertyFn prop)
 {

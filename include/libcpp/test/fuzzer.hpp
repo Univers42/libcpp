@@ -111,11 +111,13 @@ public:
 
 	FuzzRunner& iterations(int n);
 	FuzzRunner& seed(unsigned long s);
+	FuzzRunner& max_failures(int n);
 	FuzzResult  run(FuzzPropertyFn prop);
 
 private:
 	int           _iterations;
 	unsigned long _seed;
+	int           _max_failures;
 };
 
 /* ── Fuzzer assertion macro ────────────────────────────────────────────── */
