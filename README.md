@@ -1,180 +1,189 @@
-# libcpp
+# libcpp / libftpp
 
-A modular C++98 utility library built with Orthodox Canonical Form. Designed as a comprehensive toolkit for 42-school projects and beyond.
+A modular C++17 utility library implementing the **42 libftpp subject** and more. Builds a static library (`libcpp.a` / `libftpp.a`) with zero external dependencies.
 
 ## Architecture
 
 ```
 libcpp/
 ├── include/libcpp/          # public headers
-│   ├── core/                # types, Result, Option, Signal, Property, Arena
-│   ├── term/                # terminal colors, styles, table, tree, progress
+│   ├── core/                # Result, Option, Signal, Property, Arena
+│   │                        # + Memento, Observer, Singleton, StateMachine
+│   │                        #   ObservableValue (design patterns)
+│   ├── term/                # colors, styles, table, tree, progress, writer
+│   │                        # + ThreadSafeIOStream
 │   ├── log/                 # leveled logging with macros
 │   ├── test/                # test suite, snapshot, spy, fuzzer
 │   ├── bench/               # stopwatch, benchmark, profiler
 │   ├── mem/                 # memory pool, leak guard
 │   ├── str/                 # UTF-8, formatting, case conversion
-│   ├── util/                # CLI arg parser, INI config
-│   ├── data/                # Date, CSV, in-memory Database
+│   ├── util/                # CLI arg parser, INI config, Timer, Chronometer
+│   ├── data/                # Date, CSV, Database, Pool<TType>, DataBuffer
+│   ├── async/               # ThreadSafeQueue, Thread, WorkerPool, PersistentWorker
+│   ├── net/                 # Message, Client, Server (TCP/POSIX)
+│   ├── math/                # IVector2, IVector3, Random2D, PerlinNoise2D
 │   └── libcpp.hpp           # master include
 ├── src/                     # implementation files (mirrors include/)
-├── tests/                   # integration test suite
-├── demo/                    # end-to-end demo program
-├── Makefile                 # 42-compatible build
-└── CMakeLists.txt           # CMake build
+├── tests/                   # 75 integration tests
+├── demo/                    # demo programs
+├── libftpp.hpp              # umbrella header (required by subject)
+└── Makefile                 # 42-compatible build
 ```
 
 ## Quick Start
 
-### Build
-
 ```bash
-# Using Make (42 style)
-make            # builds libcpp.a
-make re         # clean rebuild
-
-# Using CMake
-mkdir build && cd build
-cmake .. && make
-```
-
-### Run Tests
-
-```bash
-make
-c++ -std=c++98 -Wall -Wextra -Werror -Iinclude tests/*.cpp -L. -lcpp -o test_runner
-./test_runner
-```
-
-### Run Demo
-
-```bash
-c++ -std=c++98 -Wall -Wextra -Werror -Iinclude demo/main.cpp -L. -lcpp -o demo_runner
-./demo_runner --name=Student --verbose
+make                 # builds libcpp.a + libftpp.a
+make test            # runs 75 integration tests
+make demo            # builds and runs libftpp demo
+make re              # clean rebuild
 ```
 
 ### Link in Your Project
 
 ```makefile
-CXXFLAGS = -std=c++98 -Wall -Wextra -Werror -I/path/to/libcpp/include
+CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -Iinclude -pthread
 LDFLAGS  = -L/path/to/libcpp -lcpp
 ```
 
-## Modules
-
-### core — Foundational types
-
-| Component | Description |
-|-----------|-------------|
-| `types.hpp` | Fixed-width typedefs (`t_u8`, `t_i32`, ...) |
-| `Result<T,E>` | Rust-inspired error handling with `ok()`, `err()`, `map()` |
-| `Option<T>` | Nullable value wrapper with `some()`, `none()`, `unwrap_or()` |
-| `Signal<A>` | Synchronous observer pattern (function + method slots) |
-| `Property<T>` | Observable value that fires `on_change` signal |
-| `Arena<T>` | Index-based arena allocator |
+Or use the subject-required name:
 
 ```cpp
-#include "libcpp/core/result.hpp"
-
-libcpp::Result<int, int> r = libcpp::Result<int, int>::ok(42);
-if (r.is_ok())
-    std::cout << r.unwrap() << std::endl;
+#include "libftpp.hpp"
+// -I. -Iinclude -lftpp
 ```
 
-### term — Terminal output
+## libftpp Subject Classes
 
-| Component | Description |
-|-----------|-------------|
-| `Srgb` | SRGB color with RGB/HSL conversion |
-| `TermStyle` | Composable text styling (bold, italic, fg/bg colors) |
-| `TableCore` | ASCII/Unicode table rendering |
-| `TreePrinter` | Tree structure visualization |
-| `ProgressBar` | Animated terminal progress bar |
-| `TermWriter` | Buffered terminal output |
+### Data Structures
 
-### log — Structured logging
-
-| Component | Description |
-|-----------|-------------|
-| `Logger` | Leveled logger (TRACE → FATAL) with sinks |
-| Macros | `LOG_DEBUG(logger, msg)`, `LOG_INFO(...)`, etc. |
-
-### test — Testing framework
-
-| Component | Description |
-|-----------|-------------|
-| `TestSuite` | Test runner with pass/fail/skip, hooks, timing |
-| `Snapshot` | Golden-file snapshot comparison |
-| `Spy` | Call-tracking test double |
-| `Fuzzer` | Random input generation for int, string, etc. |
+| Class | Header | Description |
+|-------|--------|-------------|
+| `Pool<TType>` | `data/pool.hpp` | Resource pool with RAII `Object` handles |
+| `DataBuffer` | `data/data_buffer.hpp` | Polymorphic byte container with `<<`/`>>` |
 
 ```cpp
-#include "libcpp/test/suite.hpp"
-
-void my_test(libcpp::test::TestSuite& s) {
-    ASSERT_EQ(s, 1 + 1, 2);
-    ASSERT_EQ_STR(s, libcpp::str::trim("  hi  "), "hi");
-}
-
-libcpp::test::TestSuite suite("example");
-suite.test("arithmetic", &my_test);
-suite.run();
+libcpp::data::Pool<int> pool;
+pool.resize(10);
+auto obj = pool.acquire(42);  // RAII handle — returns slot on destruction
 ```
 
-### bench — Benchmarking
+### Design Patterns
 
-| Component | Description |
-|-----------|-------------|
-| `StopWatch` | High-resolution timer |
-| `Benchmark` | Benchmark runner with warmup and statistics |
-| `Profiler` | Scoped profiling with `PROFILE_SCOPE("name")` |
+| Class | Header | Description |
+|-------|--------|-------------|
+| `Memento` | `core/memento.hpp` | Undo/redo via DataBuffer snapshots |
+| `Observer<TEvent>` | `core/observer.hpp` | Event subscription + dispatch |
+| `Singleton<TType>` | `core/singleton.hpp` | Unique instance with `instantiate`/`destroy` |
+| `StateMachine<TState>` | `core/state_machine.hpp` | States, transitions, actions |
+| `ObservableValue<TType>` | `core/observable_value.hpp` | Value wrapper that notifies on change |
 
-### mem — Memory management
+```cpp
+libcpp::core::StateMachine<GameState> sm;
+sm.addState(GameState::Menu);
+sm.addState(GameState::Play);
+sm.addTransition(GameState::Menu, GameState::Play, []{ std::cout << "Starting!\n"; });
+sm.transitionTo(GameState::Menu);
+sm.transitionTo(GameState::Play);  // prints "Starting!"
+```
 
-| Component | Description |
-|-----------|-------------|
-| `Pool<T, N>` | Fixed-size object pool (stack-allocated) |
-| `LeakGuard` | Global new/delete tracking and leak reporting |
+### IOStream
 
-### str — String utilities
+| Class | Header | Description |
+|-------|--------|-------------|
+| `ThreadSafeIOStream` | `term/thread_safe_iostream.hpp` | Thread-local buffered output with atomic flush |
 
-| Component | Description |
-|-----------|-------------|
-| `utf8_len`, `utf8_valid` | UTF-8 string operations |
-| `fmt()` | Positional format: `fmt("{0} has {1}", name, count)` |
-| `trim`, `pad_left`, `pad_right` | Whitespace manipulation |
-| `join`, `split` | Array-based join and split |
-| `to_upper`, `to_lower`, `to_snake_case`, ... | Case conversion |
+```cpp
+libcpp::threadSafeCout.setPrefix("Main");
+libcpp::threadSafeCout << "Hello" << std::endl;  // "[Main] Hello"
+```
 
-### util — Utilities
+### Threading
 
-| Component | Description |
-|-----------|-------------|
-| `ArgParser` | CLI argument parsing with flags, options, positionals |
-| `Config` | INI-style configuration file parser |
+| Class | Header | Description |
+|-------|--------|-------------|
+| `ThreadSafeQueue<T>` | `async/thread_safe_queue.hpp` | Deque + mutex + condition variable |
+| `Thread` | `async/thread.hpp` | Named thread wrapper with prefix |
+| `WorkerPool` | `async/worker_pool.hpp` | Configurable thread pool |
+| `PersistentWorker` | `async/persistent_worker.hpp` | Named task cycle loop |
 
-### data — Data structures
+```cpp
+libcpp::async::WorkerPool pool(4);
+pool.addJob([]{ /* work */ });
+```
 
-| Component | Description |
-|-----------|-------------|
-| `Date`, `DateRange` | Date arithmetic, parsing, ISO formatting |
-| `CsvDocument` | CSV parser with aggregation functions |
-| `Database` | In-memory row store with column schema and queries |
+### Network
+
+| Class | Header | Description |
+|-------|--------|-------------|
+| `Message` | `net/message.hpp` | Type ID + DataBuffer payload with serialize/deserialize |
+| `MessageConsumer` | `net/message.hpp` | Type-to-callback dispatcher |
+| `Client` | `net/client.hpp` | TCP client (POSIX sockets) |
+| `Server` | `net/server.hpp` | TCP server with per-client threads |
+
+```cpp
+libcpp::net::Message msg(MSG_CHAT);
+msg.buffer() << std::string("hello");
+auto bytes = msg.serialize();
+```
+
+### Mathematics
+
+| Class | Header | Description |
+|-------|--------|-------------|
+| `IVector2` | `math/ivector2.hpp` | 2D integer vector with arithmetic |
+| `IVector3` | `math/ivector3.hpp` | 3D integer vector with cross product |
+| `Random2DCoordinateGenerator` | `math/random_2d_coordinate_generator.hpp` | Seeded unique 2D coordinates |
+| `PerlinNoise2D` | `math/perlin_noise_2d.hpp` | Classic Perlin noise with octaves |
+
+```cpp
+libcpp::math::PerlinNoise2D noise(42);
+double v = noise.octave(x * 4.0, y * 4.0, 4, 0.5);
+```
+
+### Bonus
+
+| Class | Header | Description |
+|-------|--------|-------------|
+| `Timer` | `util/timer.hpp` | setTimeout / setInterval callbacks |
+| `Chronometer` | `util/chronometer.hpp` | High-resolution pause/resume timer |
+
+## Legacy Modules (from libcpp)
+
+| Module | Key classes |
+|--------|-------------|
+| **core** | `Result<T,E>`, `Option<T>`, `Signal<A>`, `Property<T>`, `Arena<T>` |
+| **term** | `Srgb`, `TermStyle`, `TableCore`, `TreePrinter`, `ProgressBar`, `TermWriter` |
+| **log** | `Logger` with `LOG_DEBUG`, `LOG_INFO`, `LOG_WARN`, `LOG_ERROR`, `LOG_FATAL` |
+| **test** | `TestSuite`, `Snapshot`, `Spy`, `Fuzzer` |
+| **bench** | `ScopeTimer`, `StopWatch`, `Benchmark`, `Profiler` |
+| **mem** | `Pool<T, N>` (stack-allocated), `LeakGuard` |
+| **str** | `utf8_len`, `fmt()`, `trim`, `join`, `split`, case conversion |
+| **util** | `ArgParser`, `Config` |
+| **data** | `Date`, `DateRange`, `CsvDocument`, `Database` |
+
+## Section Headers (libftpp subject)
+
+The subject requires these umbrella headers:
+
+```cpp
+#include "libcpp/data/data_structures.hpp"    // Pool, DataBuffer, CSV, Database, Date
+#include "libcpp/core/design_patterns.hpp"    // Memento, Observer, Singleton, StateMachine, ...
+#include "libcpp/async/threading.hpp"         // ThreadSafeQueue, Thread, WorkerPool, PersistentWorker
+#include "libcpp/net/network.hpp"             // Message, Client, Server
+#include "libcpp/math/mathematics.hpp"        // IVector2, IVector3, Random2D, PerlinNoise2D
+```
 
 ## Design Principles
 
-- **C++98 compliant** — no C++11 features, builds with `-std=c++98`
-- **Orthodox Canonical Form** — every class has default ctor, copy ctor, `operator=`, destructor
-- **No external dependencies** — STL only
-- **42 Makefile compatible** — `make`, `make clean`, `make fclean`, `make re`
-- **Namespace isolation** — all code under `libcpp::` with module sub-namespaces
-- **Static library** — outputs `libcpp.a`
-
-## Compiler Flags
-
-```
--std=c++98 -Wall -Wextra -Werror -Iinclude
-```
+- **C++17** — `-std=c++17 -Wall -Wextra -Werror -pthread`
+- **No external dependencies** — STL + POSIX sockets only
+- **No printf, alloc, free** — pure C++ idioms
+- **Thread-safe** — mutexes, atomics, condition variables where needed
+- **RAII everywhere** — Pool::Object, Thread, WorkerPool, Timer, etc.
+- **Namespace isolation** — `libcpp::` with module sub-namespaces
+- **Static library** — `libcpp.a` + `libftpp.a` (alias)
+- **42 Makefile** — `make`, `make clean`, `make fclean`, `make re`, `make test`
 
 ## License
 
