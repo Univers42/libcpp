@@ -82,6 +82,7 @@ public:
 	~TreeRenderer();
 
 	std::string render(const TreeNode& root) const;
+	std::string to_json(const TreeNode& root) const;
 	void print(const TreeNode& root) const;
 
 private:

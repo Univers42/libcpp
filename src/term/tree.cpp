@@ -129,6 +129,58 @@ void TreeRenderer::print(const TreeNode& root) const
 	std::cout << render(root);
 }
 
+static void _json_escape(std::ostringstream& out, const std::string& s)
+{
+	for (std::size_t i = 0; i < s.size(); ++i)
+	{
+		char c = s[i];
+		if (c == '"') out << "\\\"";
+		else if (c == '\\') out << "\\\\";
+		else if (c == '\n') out << "\\n";
+		else if (c == '\r') out << "\\r";
+		else if (c == '\t') out << "\\t";
+		else out << c;
+	}
+}
+
+static void _node_to_json(std::ostringstream& out, const TreeNode& node,
+	int indent)
+{
+	std::string pad(static_cast<std::string::size_type>(indent * 2), ' ');
+	std::string pad2(static_cast<std::string::size_type>((indent + 1) * 2), ' ');
+	out << pad << "{\n";
+	out << pad2 << "\"label\": \"";
+	_json_escape(out, node.label);
+	out << "\"";
+	if (!node.detail.empty())
+	{
+		out << ",\n" << pad2 << "\"detail\": \"";
+		_json_escape(out, node.detail);
+		out << "\"";
+	}
+	if (!node.children.empty())
+	{
+		out << ",\n" << pad2 << "\"children\": [\n";
+		for (std::size_t i = 0; i < node.children.size(); ++i)
+		{
+			_node_to_json(out, node.children[i], indent + 2);
+			if (i + 1 < node.children.size())
+				out << ",";
+			out << "\n";
+		}
+		out << pad2 << "]";
+	}
+	out << "\n" << pad << "}";
+}
+
+std::string TreeRenderer::to_json(const TreeNode& root) const
+{
+	std::ostringstream out;
+	_node_to_json(out, root, 0);
+	out << "\n";
+	return out.str();
+}
+
 void TreeRenderer::_render_node(std::ostringstream& out, const TreeNode& node,
 	const std::string& prefix, bool is_last, int depth) const
 {
