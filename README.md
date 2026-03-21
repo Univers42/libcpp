@@ -185,6 +185,22 @@ The subject requires these umbrella headers:
 - **Namespace isolation** — `libcpp::` with module sub-namespaces
 - **Static library** — `libcpp.a` + `libftpp.a` (alias)
 - **42 Makefile** — `make`, `make clean`, `make fclean`, `make re`, `make test`
+- **`[[nodiscard]]`** — annotated on all query/acquire methods
+
+## Changelog
+
+### v2.0.0 — libftpp integration (C++17)
+- Added 12 new libftpp classes: Pool, DataBuffer, Memento, Observer, Singleton, StateMachine, ObservableValue, ThreadSafeIOStream, ThreadSafeQueue, Thread, WorkerPool, PersistentWorker
+- Added TCP networking: Message, Client, Server
+- Added math: IVector2, IVector3, Random2DCoordinateGenerator, PerlinNoise2D
+- Added utils: Timer, Chronometer
+- 91 integration tests (36 libftpp-specific)
+- Full `[[nodiscard]]` annotations on query methods
+- Doxygen `@brief` comments on all class headers
+- `make stats`, `make demo` targets
+
+### v1.0.0 — Initial C++98 library
+- 55 tests, 12 modules, Orthodox Canonical Form
 
 ## License
 
