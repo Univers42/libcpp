@@ -249,7 +249,7 @@ Database Database::limit(std::size_t max_rows) const
 	Database result;
 	const std::vector<DbColumn>& cols = _table.columns();
 	for (std::size_t i = 0; i < cols.size(); ++i)
-		result.add_column(cols[i].name(), cols[i].type(), cols[i].align());
+		result.add_column(cols[i].name(), cols[i].type(), cols[i].alignment());
 	const std::vector<DbRow>& all = _table.rows();
 	std::size_t n = all.size() < max_rows ? all.size() : max_rows;
 	for (std::size_t i = 0; i < n; ++i)
