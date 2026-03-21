@@ -19,13 +19,19 @@
 ** or include individual module headers for finer control.
 */
 
-/* ── core ──────────────────────────────────────────────────────────────── */
+/* ── core (design patterns + fundamentals) ─────────────────────────────── */
 # include "libcpp/core/types.hpp"
 # include "libcpp/core/result.hpp"
 # include "libcpp/core/option.hpp"
 # include "libcpp/core/signal.hpp"
 # include "libcpp/core/property.hpp"
 # include "libcpp/core/arena.hpp"
+// New libftpp design patterns (included once headers exist):
+// # include "libcpp/core/memento.hpp"
+// # include "libcpp/core/observer.hpp"
+// # include "libcpp/core/singleton.hpp"
+// # include "libcpp/core/state_machine.hpp"
+// # include "libcpp/core/observable_value.hpp"
 
 /* ── term ──────────────────────────────────────────────────────────────── */
 # include "libcpp/term/color.hpp"
@@ -34,6 +40,7 @@
 # include "libcpp/term/tree.hpp"
 # include "libcpp/term/progress.hpp"
 # include "libcpp/term/writer.hpp"
+// # include "libcpp/term/thread_safe_iostream.hpp"
 
 /* ── log ───────────────────────────────────────────────────────────────── */
 # include "libcpp/log/logger.hpp"
@@ -67,5 +74,24 @@
 # include "libcpp/data/date.hpp"
 # include "libcpp/data/csv.hpp"
 # include "libcpp/data/database.hpp"
+// # include "libcpp/data/data_buffer.hpp"
+// # include "libcpp/data/pool.hpp"  (libftpp Pool, separate from mem::Pool)
+
+/* ── async ─────────────────────────────────────────────────────────────── */
+// # include "libcpp/async/thread_safe_queue.hpp"
+// # include "libcpp/async/thread.hpp"
+// # include "libcpp/async/worker_pool.hpp"
+// # include "libcpp/async/persistent_worker.hpp"
+
+/* ── net ───────────────────────────────────────────────────────────────── */
+// # include "libcpp/net/message.hpp"
+// # include "libcpp/net/client.hpp"
+// # include "libcpp/net/server.hpp"
+
+/* ── math ──────────────────────────────────────────────────────────────── */
+// # include "libcpp/math/ivector2.hpp"
+// # include "libcpp/math/ivector3.hpp"
+// # include "libcpp/math/random_2d_coordinate_generator.hpp"
+// # include "libcpp/math/perlin_noise_2d.hpp"
 
 #endif /* LIBCPP_LIBCPP_HPP */
