@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 21:04:27 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:44:07 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,11 +89,14 @@ public:
 
 	/* Help */
 	std::string help() const;
+	std::string version_string() const;
+	ArgParser& version(const std::string& ver);
 	std::string error() const;
 
 private:
 	std::string _program;
 	std::string _description;
+	std::string _version;
 	ArgDef      _defs[MAX_DEFS];
 	int         _def_count;
 	ArgValue    _values[MAX_ARGS];

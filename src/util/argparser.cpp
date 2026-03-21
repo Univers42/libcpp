@@ -297,5 +297,18 @@ std::string ArgParser::help() const
 
 std::string ArgParser::error() const { return _error; }
 
+ArgParser& ArgParser::version(const std::string& ver)
+{
+	_version = ver;
+	return *this;
+}
+
+std::string ArgParser::version_string() const
+{
+	std::string r = _program;
+	if (!_version.empty()) r += " v" + _version;
+	return r;
+}
+
 } /* namespace util */
 } /* namespace libcpp */
