@@ -82,9 +82,9 @@
 # include "libcpp/async/persistent_worker.hpp"
 
 /* ── net ───────────────────────────────────────────────────────────────── */
-// # include "libcpp/net/message.hpp"
-// # include "libcpp/net/client.hpp"
-// # include "libcpp/net/server.hpp"
+# include "libcpp/net/message.hpp"
+# include "libcpp/net/client.hpp"
+# include "libcpp/net/server.hpp"
 
 /* ── math ──────────────────────────────────────────────────────────────── */
 // # include "libcpp/math/ivector2.hpp"
