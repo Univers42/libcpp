@@ -7,6 +7,10 @@ obj/
 test_runner
 demo_runner
 demo/demo_libftpp
+lab/bin/
+
+# Build directories
+build/
 
 # Snapshot files
 __snapshots__/
