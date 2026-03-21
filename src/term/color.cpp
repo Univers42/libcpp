@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 20:41:12 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:38:27 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,25 @@ Srgb Srgb::complement() const
 	return Srgb((unsigned char)(255 - get_r()),
 				(unsigned char)(255 - get_g()),
 				(unsigned char)(255 - get_b()));
+}
+
+Srgb Srgb::grayscale() const
+{
+	unsigned char g = static_cast<unsigned char>(luminance());
+	return Srgb(g, g, g);
+}
+
+Srgb Srgb::invert() const { return complement(); }
+
+bool Srgb::is_dark() const { return luminance() < 128.0; }
+bool Srgb::is_light() const { return !is_dark(); }
+
+double Srgb::contrast_ratio(const Srgb& other) const
+{
+	double l1 = luminance() / 255.0;
+	double l2 = other.luminance() / 255.0;
+	if (l1 < l2) { double t = l1; l1 = l2; l2 = t; }
+	return (l1 + 0.05) / (l2 + 0.05);
 }
 
 double Srgb::luminance() const

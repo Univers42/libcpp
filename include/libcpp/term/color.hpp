@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 20:41:11 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:38:27 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,11 @@ public:
 	Srgb saturate(double factor) const;
 	Srgb desaturate(double factor) const;
 	Srgb complement() const;
+	Srgb grayscale() const;
+	Srgb invert() const;
+	bool is_dark() const;
+	bool is_light() const;
+	double contrast_ratio(const Srgb& other) const;
 	double luminance() const;
 	int to_ansi_256() const;
 
