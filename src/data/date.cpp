@@ -16,7 +16,8 @@
 #include <ctime>
 #include <cstdlib>
 #include <stdexcept>
-0.namespace libcpp
+
+namespace libcpp
 {
 namespace data
 {
