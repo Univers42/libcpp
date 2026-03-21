@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 20:51:53 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:28:32 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,10 +170,10 @@ Diff myers_diff(const std::string& old_text, const std::string& new_text)
 
 /* ── Snapshot ──────────────────────────────────────────────────────────── */
 
-Snapshot::Snapshot() : _snap_dir("__snapshots__"), _update(false) {}
-Snapshot::Snapshot(const std::string& snap_dir) : _snap_dir(snap_dir), _update(false) {}
+Snapshot::Snapshot() : _snap_dir("__snapshots__"), _update(false), _strip_ansi(false) {}
+Snapshot::Snapshot(const std::string& snap_dir) : _snap_dir(snap_dir), _update(false), _strip_ansi(false) {}
 Snapshot::Snapshot(const Snapshot& o)
-	: _snap_dir(o._snap_dir), _last_diff(o._last_diff), _update(o._update) {}
+	: _snap_dir(o._snap_dir), _last_diff(o._last_diff), _update(o._update), _strip_ansi(o._strip_ansi) {}
 Snapshot& Snapshot::operator=(const Snapshot& o)
 {
 	if (this != &o)
@@ -181,36 +181,61 @@ Snapshot& Snapshot::operator=(const Snapshot& o)
 		_snap_dir = o._snap_dir;
 		_last_diff = o._last_diff;
 		_update = o._update;
+		_strip_ansi = o._strip_ansi;
 	}
 	return *this;
 }
 Snapshot::~Snapshot() {}
 
+static std::string _strip_ansi_codes(const std::string& s)
+{
+	std::string out;
+	bool in_esc = false;
+	for (std::size_t i = 0; i < s.size(); ++i)
+	{
+		if (in_esc)
+		{
+			if (s[i] == 'm') in_esc = false;
+			continue;
+		}
+		if (static_cast<unsigned char>(s[i]) == 0x1B && i + 1 < s.size() && s[i + 1] == '[')
+		{
+			in_esc = true;
+			++i;
+			continue;
+		}
+		out += s[i];
+	}
+	return out;
+}
+
 bool Snapshot::match(const std::string& name, const std::string& actual)
 {
 	std::string p = _path(name);
 	std::string existing = _read_file(p);
+	std::string cmp_actual = _strip_ansi ? _strip_ansi_codes(actual) : actual;
+	std::string cmp_existing = _strip_ansi ? _strip_ansi_codes(existing) : existing;
 
-	if (existing.empty())
+	if (cmp_existing.empty())
 	{
 		/* No snapshot — create it */
-		_write_file(p, actual);
+		_write_file(p, cmp_actual);
 		_last_diff = Diff();
 		return true;
 	}
 
-	if (existing == actual)
+	if (cmp_existing == cmp_actual)
 	{
 		_last_diff = Diff();
 		return true;
 	}
 
 	/* Mismatch */
-	_last_diff = myers_diff(existing, actual);
+	_last_diff = myers_diff(cmp_existing, cmp_actual);
 
 	if (_update)
 	{
-		_write_file(p, actual);
+		_write_file(p, cmp_actual);
 		return true;
 	}
 	return false;
@@ -219,6 +244,8 @@ bool Snapshot::match(const std::string& name, const std::string& actual)
 const Diff& Snapshot::last_diff() const { return _last_diff; }
 void Snapshot::set_update(bool on) { _update = on; }
 bool Snapshot::update_mode() const { return _update; }
+void Snapshot::set_strip_ansi(bool on) { _strip_ansi = on; }
+bool Snapshot::strip_ansi_mode() const { return _strip_ansi; }
 
 std::string Snapshot::_path(const std::string& name) const
 {

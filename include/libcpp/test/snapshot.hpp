@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 20:51:53 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:27:50 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,15 @@ public:
 	void set_update(bool on);
 	bool update_mode() const;
 
+	/* Enable/disable strip-ANSI mode (removes escape sequences before compare) */
+	void set_strip_ansi(bool on);
+	bool strip_ansi_mode() const;
+
 private:
 	std::string _snap_dir;
 	Diff        _last_diff;
 	bool        _update;
+	bool        _strip_ansi;
 
 	std::string _path(const std::string& name) const;
 	std::string _read_file(const std::string& path) const;
