@@ -82,6 +82,13 @@ void TermWriter::writeln(const std::string& markdown)
 
 void TermWriter::nl() { *_os << "\n"; }
 
+void TermWriter::write_raw(const std::string& text) { *_os << text; }
+
+void TermWriter::hr(int width, char ch)
+{
+	*_os << std::string(width, ch) << "\n";
+}
+
 void TermWriter::define_callout(const std::string& name, const ElemStyle& style)
 {
 	_callouts[name] = style;

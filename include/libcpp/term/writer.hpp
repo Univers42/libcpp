@@ -40,7 +40,9 @@ public:
 	/* ── API ───────────────────────────────────────────────────── */
 	void write(const std::string& markdown);
 	void writeln(const std::string& markdown);
+	void write_raw(const std::string& text);
 	void nl();
+	void hr(int width, char ch);
 
 	/* ── callout registry ──────────────────────────────────────── */
 	void define_callout(const std::string& name, const ElemStyle& style);
