@@ -181,6 +181,36 @@ int Table::col_count() const  { return _ncols; }
 int Table::row_count() const  { return _nrows; }
 bool Table::has_header() const { return _has_header; }
 
+void Table::clear()
+{
+	_nrows = 0;
+	_has_header = false;
+}
+
+std::string Table::to_csv(char delim) const
+{
+	std::string out;
+	if (_has_header)
+	{
+		for (int c = 0; c < _ncols; ++c)
+		{
+			if (c > 0) out += delim;
+			out += _headers[c];
+		}
+		out += '\n';
+	}
+	for (int r = 0; r < _nrows; ++r)
+	{
+		for (int c = 0; c < _ncols; ++c)
+		{
+			if (c > 0) out += delim;
+			out += _rows[r][c];
+		}
+		out += '\n';
+	}
+	return out;
+}
+
 /* ── rendering internals ───────────────────────────────────────────────── */
 
 void Table::_compute_widths() const

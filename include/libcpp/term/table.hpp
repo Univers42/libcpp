@@ -79,11 +79,13 @@ public:
 
 	/* ── render ────────────────────────────────────────────────── */
 	std::string render() const;
+	std::string to_csv(char delim) const;
 
 	/* ── info ──────────────────────────────────────────────────── */
 	int col_count() const;
 	int row_count() const;
 	bool has_header() const;
+	void clear();
 
 private:
 	int         _ncols;
