@@ -211,6 +211,9 @@ void Spinner::done(const std::string& final_msg)
 
 void Spinner::update_label(const std::string& label) { _label = label; }
 
+bool Spinner::is_done() const { return _done; }
+std::size_t Spinner::frame() const { return _frame; }
+
 std::string Spinner::render() const
 {
 	if (_done)

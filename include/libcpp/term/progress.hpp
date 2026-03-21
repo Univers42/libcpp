@@ -106,6 +106,8 @@ public:
 	void done(const std::string& final_msg = "");
 	void update_label(const std::string& label);
 	std::string render() const;
+	bool is_done() const;
+	std::size_t frame() const;
 
 private:
 	std::string _label;
