@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 20:56:08 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:45:02 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,13 @@ void Profiler::report() const
 void Profiler::reset() { _count = 0; }
 int Profiler::entry_count() const { return _count; }
 const ProfileEntry& Profiler::entry(int i) const { return _entries[i]; }
+
+const ProfileEntry* Profiler::find(const std::string& name) const
+{
+	int idx = _find(name);
+	if (idx < 0) return 0;
+	return &_entries[idx];
+}
 
 /* ── ProfileScope ──────────────────────────────────────────────────────── */
 

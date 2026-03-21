@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 20:55:53 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:45:01 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ public:
 	/* Access entries */
 	int                  entry_count() const;
 	const ProfileEntry&  entry(int i) const;
+	const ProfileEntry*  find(const std::string& name) const;
 
 private:
 	ProfileEntry _entries[MAX_ENTRIES];
