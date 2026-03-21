@@ -200,6 +200,19 @@ bool contains(const std::string& s, const std::string& sub)
 	return s.find(sub) != std::string::npos;
 }
 
+int count(const std::string& s, const std::string& sub)
+{
+	if (sub.empty()) return 0;
+	int n = 0;
+	std::string::size_type pos = 0;
+	while ((pos = s.find(sub, pos)) != std::string::npos)
+	{
+		++n;
+		pos += sub.size();
+	}
+	return n;
+}
+
 /* ── Message ───────────────────────────────────────────────────────────── */
 
 Message::Message() {}

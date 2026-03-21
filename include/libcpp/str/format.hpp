@@ -65,6 +65,7 @@ bool        ends_with(const std::string& s, const std::string& suffix);
 std::string replace_all(const std::string& s, const std::string& from,
 						const std::string& to);
 bool        contains(const std::string& s, const std::string& sub);
+int         count(const std::string& s, const std::string& sub);
 
 /* ── Message — streamable string builder (replaces old message.hpp) ────── */
 
