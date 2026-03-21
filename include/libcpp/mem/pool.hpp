@@ -157,6 +157,21 @@ public:
 			if (_alive[i]) fn(*_cptr(i));
 	}
 
+	/* Find first live object equal to val; returns pointer or 0 */
+	T* find(const T& val)
+	{
+		for (int i = 0; i < Capacity; ++i)
+			if (_alive[i] && *_ptr(i) == val) return _ptr(i);
+		return 0;
+	}
+
+	const T* find(const T& val) const
+	{
+		for (int i = 0; i < Capacity; ++i)
+			if (_alive[i] && *_cptr(i) == val) return _cptr(i);
+		return 0;
+	}
+
 private:
 	/* Storage: char array avoids default-constructing T objects */
 	char _storage[Capacity * sizeof(T)];
