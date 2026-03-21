@@ -56,10 +56,15 @@ void ScopeTimer::reset() { _start = std::clock(); }
 
 /* ── StopWatch ─────────────────────────────────────────────────────────── */
 
-StopWatch::StopWatch() : _start(0), _accumulated(0.0), _running(false) {}
+StopWatch::StopWatch() : _start(0), _accumulated(0.0), _running(false), _lap_count(0), _lap_start(0.0) {}
 
 StopWatch::StopWatch(const StopWatch& o)
-	: _start(o._start), _accumulated(o._accumulated), _running(o._running) {}
+	: _start(o._start), _accumulated(o._accumulated), _running(o._running),
+	  _lap_count(o._lap_count), _lap_start(o._lap_start)
+{
+	for (int i = 0; i < _lap_count; ++i)
+		_laps[i] = o._laps[i];
+}
 
 StopWatch& StopWatch::operator=(const StopWatch& o)
 {
@@ -68,6 +73,10 @@ StopWatch& StopWatch::operator=(const StopWatch& o)
 		_start = o._start;
 		_accumulated = o._accumulated;
 		_running = o._running;
+		_lap_count = o._lap_count;
+		_lap_start = o._lap_start;
+		for (int i = 0; i < _lap_count; ++i)
+			_laps[i] = o._laps[i];
 	}
 	return *this;
 }
@@ -80,6 +89,7 @@ void StopWatch::start()
 	{
 		_start = std::clock();
 		_running = true;
+		_lap_start = _accumulated;
 	}
 }
 
@@ -108,9 +118,29 @@ void StopWatch::reset()
 	_accumulated = 0.0;
 	_running = false;
 	_start = 0;
+	_lap_count = 0;
+	_lap_start = 0.0;
 }
 
 bool StopWatch::running() const { return _running; }
+
+double StopWatch::lap()
+{
+	double now = elapsed_ms();
+	double dt = now - _lap_start;
+	if (_lap_count < MAX_LAPS)
+		_laps[_lap_count++] = dt;
+	_lap_start = now;
+	return dt;
+}
+
+int StopWatch::lap_count() const { return _lap_count; }
+
+double StopWatch::lap_time(int i) const
+{
+	if (i < 0 || i >= _lap_count) return 0.0;
+	return _laps[i];
+}
 
 } /* namespace bench */
 } /* namespace libcpp */
