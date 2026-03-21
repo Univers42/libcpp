@@ -65,6 +65,8 @@ public:
 	int              count() const;
 	bool             was_called() const;
 	bool             was_called_with(const std::string& tag) const;
+	bool             was_called_times(int n) const;
+	std::string      last_tag() const;
 	const CallRecord& at(int index) const;
 	const CallRecord& last() const;
 	const CallRecord& first() const;

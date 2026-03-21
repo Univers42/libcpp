@@ -75,6 +75,14 @@ bool Spy::was_called_with(const std::string& tag) const
 	return false;
 }
 
+bool Spy::was_called_times(int n) const { return _count == n; }
+
+std::string Spy::last_tag() const
+{
+	if (_count > 0) return _calls[_count - 1].tag;
+	return std::string();
+}
+
 const CallRecord& Spy::at(int index) const
 {
 	static CallRecord empty;
