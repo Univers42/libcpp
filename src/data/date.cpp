@@ -6,7 +6,7 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 21:34:22 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/21 21:36:10 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <stdexcept>
-
-namespace libcpp
+0.namespace libcpp
 {
 namespace data
 {

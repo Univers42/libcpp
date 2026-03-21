@@ -213,6 +213,31 @@ int count(const std::string& s, const std::string& sub)
 	return n;
 }
 
+std::string reverse(const std::string& s)
+{
+	std::string r(s.rbegin(), s.rend());
+	return r;
+}
+
+std::string center(const std::string& s, int width, char pad)
+{
+	int len = static_cast<int>(s.size());
+	if (len >= width) return s;
+	int total = width - len;
+	int left = total / 2;
+	int right = total - left;
+	return std::string(left, pad) + s + std::string(right, pad);
+}
+
+std::string truncate(const std::string& s, int max_len,
+					 const std::string& suffix)
+{
+	if (static_cast<int>(s.size()) <= max_len) return s;
+	int suf_len = static_cast<int>(suffix.size());
+	if (max_len <= suf_len) return suffix.substr(0, max_len);
+	return s.substr(0, max_len - suf_len) + suffix;
+}
+
 /* ── Message ───────────────────────────────────────────────────────────── */
 
 Message::Message() {}

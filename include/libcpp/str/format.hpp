@@ -66,6 +66,10 @@ std::string replace_all(const std::string& s, const std::string& from,
 						const std::string& to);
 bool        contains(const std::string& s, const std::string& sub);
 int         count(const std::string& s, const std::string& sub);
+std::string reverse(const std::string& s);
+std::string center(const std::string& s, int width, char pad);
+std::string truncate(const std::string& s, int max_len,
+					 const std::string& suffix);
 
 /* ── Message — streamable string builder (replaces old message.hpp) ────── */
 
