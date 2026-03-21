@@ -118,6 +118,11 @@ public:
 	void assert_gt(long a, long b, const char* file, int line);
 	void assert_le(long a, long b, const char* file, int line);
 	void assert_ge(long a, long b, const char* file, int line);
+	void assert_null(const void* p, const char* file, int line);
+	void assert_not_null(const void* p, const char* file, int line);
+	void assert_str_contains(const std::string& haystack,
+							 const std::string& needle,
+							 const char* file, int line);
 
 	/* Accessors */
 	int           test_count() const;
@@ -183,6 +188,15 @@ private:
 # define ASSERT_GE(suite, a, b) \
 	(suite).assert_ge(static_cast<long>(a), static_cast<long>(b), \
 					  __FILE__, __LINE__)
+
+# define ASSERT_NULL(suite, p) \
+	(suite).assert_null(static_cast<const void*>(p), __FILE__, __LINE__)
+
+# define ASSERT_NOT_NULL(suite, p) \
+	(suite).assert_not_null(static_cast<const void*>(p), __FILE__, __LINE__)
+
+# define ASSERT_STR_CONTAINS(suite, haystack, needle) \
+	(suite).assert_str_contains((haystack), (needle), __FILE__, __LINE__)
 
 } /* namespace test */
 } /* namespace libcpp */

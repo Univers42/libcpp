@@ -303,6 +303,30 @@ void TestSuite::assert_ge(long a, long b, const char* file, int line)
 	}
 }
 
+void TestSuite::assert_null(const void* p, const char* file, int line)
+{
+	if (p != 0)
+		throw AssertError("expected NULL pointer", file, line);
+}
+
+void TestSuite::assert_not_null(const void* p, const char* file, int line)
+{
+	if (p == 0)
+		throw AssertError("expected non-NULL pointer", file, line);
+}
+
+void TestSuite::assert_str_contains(const std::string& haystack,
+									const std::string& needle,
+									const char* file, int line)
+{
+	if (haystack.find(needle) == std::string::npos)
+	{
+		std::ostringstream oss;
+		oss << "expected \"" << haystack << "\" to contain \"" << needle << "\"";
+		throw AssertError(oss.str(), file, line);
+	}
+}
+
 /* ── Accessors ─────────────────────────────────────────────────────────── */
 
 int TestSuite::test_count() const { return _test_count; }
