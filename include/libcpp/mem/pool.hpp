@@ -141,6 +141,22 @@ public:
 		return (idx >= 0 && _alive[idx]);
 	}
 
+	/* Iterate over all live objects — calls fn(T&) for each */
+	typedef void (*PoolFn)(T&);
+	void for_each(PoolFn fn)
+	{
+		for (int i = 0; i < Capacity; ++i)
+			if (_alive[i]) fn(*_ptr(i));
+	}
+
+	/* Const version */
+	typedef void (*PoolFnConst)(const T&);
+	void for_each(PoolFnConst fn) const
+	{
+		for (int i = 0; i < Capacity; ++i)
+			if (_alive[i]) fn(*_cptr(i));
+	}
+
 private:
 	/* Storage: char array avoids default-constructing T objects */
 	char _storage[Capacity * sizeof(T)];
