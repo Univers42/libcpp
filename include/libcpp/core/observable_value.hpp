@@ -21,7 +21,7 @@ public:
     ~ObservableValue() = default;
 
     // Get the current value
-    const TType& get() const { return _value; }
+    [[nodiscard]] const TType& get() const { return _value; }
     operator const TType&() const { return _value; }
 
     // Set a new value (notifies all observers if changed)

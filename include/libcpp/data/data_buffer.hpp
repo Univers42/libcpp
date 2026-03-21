@@ -54,10 +54,10 @@ public:
     DataBuffer& operator>>(std::string& str);
 
     // ── Accessors ───────────────────────────────────────────────────
-    size_t size() const;
-    bool   empty() const;
+    [[nodiscard]] size_t size() const;
+    [[nodiscard]] bool   empty() const;
     void   clear();
-    const std::vector<char>& raw() const;
+    [[nodiscard]] const std::vector<char>& raw() const;
 
     // ── Raw import (for network deserialization) ────────────────────
     void setRaw(const char* data, size_t size);
@@ -65,7 +65,7 @@ public:
 
     // ── Read cursor control ─────────────────────────────────────────
     void   resetCursor();
-    size_t cursor() const;
+    [[nodiscard]] size_t cursor() const;
 
 private:
     std::vector<char> _data;

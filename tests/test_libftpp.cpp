@@ -109,7 +109,7 @@ static void test_observer_notify(libcpp::test::TestSuite& s)
 {
     libcpp::core::Observer<int> obs;
     int received = 0;
-    obs.subscribe(42, [&]() { received = 42; });
+    (void)obs.subscribe(42, [&]() { received = 42; });
     obs.notify(42);
     ASSERT_EQ(s, received, 42);
 }

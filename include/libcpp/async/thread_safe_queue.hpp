@@ -70,7 +70,7 @@ public:
     }
 
     // Non-blocking attempt
-    std::optional<TType> try_pop_front()
+    [[nodiscard]] std::optional<TType> try_pop_front()
     {
         std::lock_guard<std::mutex> lock(_mtx);
         if (_queue.empty())
@@ -80,13 +80,13 @@ public:
         return val;
     }
 
-    size_t size() const
+    [[nodiscard]] size_t size() const
     {
         std::lock_guard<std::mutex> lock(_mtx);
         return _queue.size();
     }
 
-    bool empty() const
+    [[nodiscard]] bool empty() const
     {
         std::lock_guard<std::mutex> lock(_mtx);
         return _queue.empty();

@@ -60,14 +60,14 @@ public:
         it->second();
     }
 
-    TState currentState() const
+    [[nodiscard]] TState currentState() const
     {
         if (!_initialized)
             throw std::runtime_error("StateMachine: not initialized");
         return _current;
     }
 
-    bool canTransitionTo(const TState& state) const
+    [[nodiscard]] bool canTransitionTo(const TState& state) const
     {
         if (!_initialized)
             return false;

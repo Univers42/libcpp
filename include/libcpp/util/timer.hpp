@@ -30,7 +30,7 @@ public:
     // Cancel a pending or repeating timer
     void stop();
 
-    bool isRunning() const;
+    [[nodiscard]] bool isRunning() const;
 
 private:
     std::atomic<bool> _running{false};

@@ -91,7 +91,7 @@ public:
     }
 
     template <typename... TArgs>
-    Object<TType> acquire(TArgs&&... p_args)
+    [[nodiscard]] Object<TType> acquire(TArgs&&... p_args)
     {
         std::lock_guard<std::mutex> lock(_mtx);
         for (size_t i = 0; i < _slots.size(); ++i) {
@@ -105,13 +105,13 @@ public:
         throw std::runtime_error("Pool: no available slots");
     }
 
-    size_t capacity() const
+    [[nodiscard]] size_t capacity() const
     {
         std::lock_guard<std::mutex> lock(_mtx);
         return _slots.size();
     }
 
-    size_t available() const
+    [[nodiscard]] size_t available() const
     {
         std::lock_guard<std::mutex> lock(_mtx);
         size_t count = 0;
@@ -120,7 +120,7 @@ public:
         return count;
     }
 
-    bool full() const
+    [[nodiscard]] bool full() const
     {
         std::lock_guard<std::mutex> lock(_mtx);
         for (const auto& s : _slots)

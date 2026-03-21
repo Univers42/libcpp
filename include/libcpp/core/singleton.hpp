@@ -13,12 +13,12 @@ namespace core {
 template <typename TType>
 class Singleton {
 public:
-    static TType* instance()
+    [[nodiscard]] static TType* instance()
     {
         return _instance.get();
     }
 
-    static bool isInstantiated()
+    [[nodiscard]] static bool isInstantiated()
     {
         return _instance != nullptr;
     }

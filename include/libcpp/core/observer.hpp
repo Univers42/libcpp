@@ -20,7 +20,7 @@ public:
     Observer() = default;
     ~Observer() = default;
 
-    SubscriptionId subscribe(const TEvent& event,
+    [[nodiscard]] SubscriptionId subscribe(const TEvent& event,
                              const std::function<void()>& lambda)
     {
         std::lock_guard<std::mutex> lock(_mtx);
@@ -53,7 +53,7 @@ public:
             pair.second();
     }
 
-    size_t listenerCount(const TEvent& event) const
+    [[nodiscard]] size_t listenerCount(const TEvent& event) const
     {
         std::lock_guard<std::mutex> lock(_mtx);
         auto it = _listeners.find(event);

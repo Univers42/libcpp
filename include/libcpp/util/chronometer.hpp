@@ -18,11 +18,11 @@ public:
     void reset();
 
     // Elapsed since start (or between start/stop), in various units
-    double elapsedSeconds() const;
-    double elapsedMilliseconds() const;
-    double elapsedMicroseconds() const;
+    [[nodiscard]] double elapsedSeconds() const;
+    [[nodiscard]] double elapsedMilliseconds() const;
+    [[nodiscard]] double elapsedMicroseconds() const;
 
-    bool isRunning() const;
+    [[nodiscard]] bool isRunning() const;
 
 private:
     using Clock     = std::chrono::steady_clock;
