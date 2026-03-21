@@ -53,4 +53,13 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+# ── Test runner ──────────────────────────────────────────────────────────────
+
+TEST_SRC = $(wildcard tests/*.cpp)
+TEST_BIN = test_runner
+
+test: $(NAME)
+	@$(CXX) $(CXXFLAGS) $(TEST_SRC) -L. -lcpp -o $(TEST_BIN)
+	@./$(TEST_BIN)
+
+.PHONY: all clean fclean re test
