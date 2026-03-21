@@ -143,8 +143,17 @@ public:
 	/* ── metrics ───────────────────────────────────────────────── */
 	std::size_t capacity() const { return _capacity; }
 	std::size_t count() const    { return _count; }
+	std::size_t available() const { return _capacity - _count; }
 	bool empty() const           { return _count == 0; }
 	bool full() const            { return _count == _capacity; }
+
+	/* ── iteration (callback receives index and const reference) ── */
+	void for_each(void (*fn)(Index, const T&)) const
+	{
+		for (std::size_t i = 0; i < _capacity; ++i)
+			if (_alive[i])
+				fn(i, _data[i]);
+	}
 
 	/* ── reset: destroy all, reclaim all slots ─────────────────── */
 	void reset()
