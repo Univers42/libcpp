@@ -1,23 +1,26 @@
 # ══════════════════════════════════════════════════════════════════════════════
 #  libcpp / libftpp — C++17 utility & systems library
 #
-#  Builds two identical static archives:
-#    build/lib/libcpp.a   — primary archive
-#    build/lib/libftpp.a  — alias required by the libftpp subject
+#  Targets:
+#    make          → build/lib/libcpp.a  + build/lib/libftpp.a  (static)
+#    make shared   → build/lib/libcpp.so + build/lib/libftpp.so (shared)
+#    make both     → static + shared
 #
 #  Build tree:
-#    build/obj/   — compiled object files (mirrors src/ tree)
-#    build/dep/   — auto-generated header dependency files (.d)
-#    build/lib/   — static archives (.a)
-#    build/bin/   — demo and test binaries
+#    build/obj/    — position-independent object files (usable for both .a/.so)
+#    build/dep/    — auto-generated header dependency files (.d)
+#    build/lib/    — static (.a) and/or shared (.so) libraries
+#    build/bin/    — demo and test binaries
 #
-#  Usage:
-#    $(MAKE) -C path/to/libcpp
+#  Usage (static):
 #    $(CXX) ... -Lpath/to/libcpp/build/lib -Ipath/to/libcpp/include -lcpp
+#  Usage (shared, runtime path baked in):
+#    $(CXX) ... -Lbuild/lib -Wl,-rpath,build/lib -lcpp
 # ══════════════════════════════════════════════════════════════════════════════
 
 CXX      = c++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -Iinclude -pthread
+# -fPIC is always on so the same .o files work for both .a and .so
+CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -Iinclude -pthread -fPIC
 AR       = ar rcs
 
 # ── Build directories ─────────────────────────────────────────────────────────
@@ -27,11 +30,16 @@ DEP_DIR   = $(BUILD_DIR)/dep
 LIB_DIR   = $(BUILD_DIR)/lib
 BIN_DIR   = $(BUILD_DIR)/bin
 
+# Static libraries
 NAME   = $(LIB_DIR)/libcpp.a
 FTNAME = $(LIB_DIR)/libftpp.a
 
+# Shared libraries
+SONAME   = $(LIB_DIR)/libcpp.so
+FTSONAME = $(LIB_DIR)/libftpp.so
+
 # Parallel jobs — use all available cores
-MAKEFLAGS += -j$(shell nproc)
+MAKEFLAGS += -j$(shell nproc) --no-print-directory
 
 # All .cpp files under src/
 SRC = $(shell find src -name '*.cpp')
@@ -51,6 +59,11 @@ RED    = \033[91m
 
 all: $(NAME) $(FTNAME)
 
+shared: $(SONAME) $(FTSONAME)
+
+both: all shared
+
+# Static archives
 $(NAME): $(BUILD_STAMP) $(OBJ)
 	@$(AR) $@ $(OBJ)
 	@printf "  $(GREEN)●$(RESET) $(BOLD)$(notdir $(NAME))$(RESET) $(DIM)archived ($(words $(OBJ)) objects)$(RESET)\n"
@@ -58,6 +71,15 @@ $(NAME): $(BUILD_STAMP) $(OBJ)
 $(FTNAME): $(NAME)
 	@cp $(NAME) $(FTNAME)
 	@printf "  $(GREEN)●$(RESET) $(BOLD)$(notdir $(FTNAME))$(RESET) $(DIM)(alias of $(notdir $(NAME)))$(RESET)\n"
+
+# Shared libraries  (-shared + SONAME baked in)
+$(SONAME): $(BUILD_STAMP) $(OBJ)
+	@$(CXX) -shared -Wl,-soname,$(notdir $(SONAME)) $(OBJ) -o $@
+	@printf "  $(GREEN)●$(RESET) $(BOLD)$(notdir $(SONAME))$(RESET) $(DIM)linked ($(words $(OBJ)) objects)$(RESET)\n"
+
+$(FTSONAME): $(SONAME)
+	@cp $(SONAME) $(FTSONAME)
+	@printf "  $(GREEN)●$(RESET) $(BOLD)$(notdir $(FTSONAME))$(RESET) $(DIM)(alias of $(notdir $(SONAME)))$(RESET)\n"
 
 # Pre-create the full obj/dep mirror of src/ before any parallel compile job runs
 SRC_DIRS   = $(sort $(dir $(SRC)))
@@ -101,7 +123,7 @@ TEST_BIN = $(BIN_DIR)/test_runner
 
 test: $(NAME)
 	@mkdir -p $(BIN_DIR)
-	@$(CXX) $(CXXFLAGS) $(TEST_SRC) -L$(LIB_DIR) -lcpp -o $(TEST_BIN)
+	@$(CXX) $(CXXFLAGS) $(TEST_SRC) -L$(LIB_DIR) -l:libcpp.a -o $(TEST_BIN)
 	@$(TEST_BIN)
 
 # ── Demo ─────────────────────────────────────────────────────────────────────
@@ -111,7 +133,7 @@ DEMO_BIN = $(BIN_DIR)/demo_libftpp
 
 demo: $(NAME)
 	@mkdir -p $(BIN_DIR)
-	@$(CXX) $(CXXFLAGS) -I. $(DEMO_SRC) -L$(LIB_DIR) -lcpp -o $(DEMO_BIN)
+	@$(CXX) $(CXXFLAGS) -I. $(DEMO_SRC) -L$(LIB_DIR) -l:libcpp.a -o $(DEMO_BIN)
 	@$(DEMO_BIN)
 
 # ── compile_studio ───────────────────────────────────────────────────────────
@@ -146,12 +168,12 @@ run_tests: compile_studio
 $(BIN_DIR)/studio/demo/%: studio/demo/%.cpp $(NAME)
 	@mkdir -p $(dir $@)
 	@printf "  $(DIM)studio/demo$(RESET)  $(CYAN)%-30s$(RESET)\n" "$(notdir $<)"
-	@$(CXX) $(CXXFLAGS) $< -L$(LIB_DIR) -lcpp -o $@
+	@$(CXX) $(CXXFLAGS) $< -L$(LIB_DIR) -l:libcpp.a -o $@
 
 $(STUDIO_TEST_BIN): $(STUDIO_TEST_SRC) $(NAME)
 	@mkdir -p $(dir $@)
 	@printf "  $(DIM)studio/tests$(RESET) $(CYAN)%-30s$(RESET)\n" "test_runner"
-	@$(CXX) $(CXXFLAGS) $(STUDIO_TEST_SRC) -L$(LIB_DIR) -lcpp -o $@
+	@$(CXX) $(CXXFLAGS) $(STUDIO_TEST_SRC) -L$(LIB_DIR) -l:libcpp.a -o $@
 
 # ── Stats ────────────────────────────────────────────────────────────────────
 
@@ -187,4 +209,4 @@ norminette: $(VENV_PY)
 	@PATH="$(VENV)/bin:$$PATH" $(VENV_PY) $(SCRIPTS)/norminette.sh src include studio \
 		-- $(CXXFLAGS) -I.
 
-.PHONY: all clean fclean re test demo stats compile_studio run_demos run_tests pyenv format norminette
+.PHONY: all shared both clean fclean re test demo stats compile_studio run_demos run_tests pyenv format norminette
