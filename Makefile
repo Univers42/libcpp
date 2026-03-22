@@ -125,4 +125,32 @@ stats:
 	@printf "  $(BOLD)test files  $(RESET) $(YELLOW)%s$(RESET)\n" "$$(find tests -name '*.cpp' | wc -l)"
 	@printf "  $(BOLD)total lines $(RESET) $(YELLOW)%s$(RESET)\n" "$$(find include src tests -name '*.hpp' -o -name '*.cpp' | xargs wc -l | tail -1 | awk '{print $$1}')"
 
-.PHONY: all clean fclean re test demo stats compile_studio run_demos run_tests
+# ── Python virtual-environment (no sudo required) ───────────────────────────
+#  make pyenv       → create .pyenv/ venv and install pip deps
+#  make format      → auto-format all .cpp/.hpp with clang-format (Google style)
+#  make norminette  → lint all .cpp/.hpp with vendor/scripts/norminette.sh
+
+VENV       = .pyenv
+VENV_PY    = $(VENV)/bin/python3
+SCRIPTS    = vendor/scripts
+
+NORM_SRC   = $(shell find src include studio -name '*.cpp' -o -name '*.hpp' 2>/dev/null)
+
+pyenv:
+	@bash $(SCRIPTS)/setup_pyenv.sh
+
+$(VENV_PY):
+	@bash $(SCRIPTS)/setup_pyenv.sh
+
+format: $(VENV_PY)
+	@printf "\n  $(BOLD)$(CYAN) Auto-formatting C++ Source Files$(RESET)\n"
+	@find src include studio -name "*.cpp" -o -name "*.hpp" | \
+		xargs $(VENV)/bin/clang-format -i -style=file
+	@printf "  $(GREEN)●$(RESET) Files formatted successfully using Google style.\n"
+
+norminette: $(VENV_PY)
+	@printf "\n  $(BOLD)$(CYAN) Running C++ Code Quality Checks$(RESET)\n"
+	@PATH="$(VENV)/bin:$$PATH" $(VENV_PY) $(SCRIPTS)/norminette.sh src include studio \
+		-- $(CXXFLAGS) -I.
+
+.PHONY: all clean fclean re test demo stats compile_studio run_demos run_tests pyenv format norminette
