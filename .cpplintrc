@@ -1,0 +1,5 @@
+set noparent
+filter=-legal/copyright
+linelength=80
+tab_width=2
+extensions=cpp,h,cc,cxx,hpp,hh
