@@ -53,11 +53,7 @@ RED    = \033[91m
 
 # ── Targets ──────────────────────────────────────────────────────────────────
 
-all: $(NAME)
-
-shared: $(SONAME)
-
-both: all shared
+all: $(NAME) $(SONAME)
 
 # Static archive
 $(NAME): $(BUILD_STAMP) $(OBJ)
@@ -98,7 +94,7 @@ clean:
 	@printf "  $(DIM)clean$(RESET) — obj and dep removed\n"
 
 fclean: clean
-	@rm -rf $(LIB_DIR) $(BIN_DIR)
+	@rm -rf $(BUILD_DIR)
 	@printf "  $(DIM)fclean$(RESET) — lib and bin removed\n"
 
 re: fclean
@@ -126,10 +122,10 @@ demo: $(NAME)
 
 # ── compile_studio ───────────────────────────────────────────────────────────
 #  Compiles every .cpp in studio/ unitarily:
-#    - studio/demo/*.cpp   → build/bin/studio/demo/<name>   (each standalone)
-#    - studio/tests/*.cpp  → build/bin/studio/tests/test_runner (linked together)
+#    - studio/demo/**/*.cpp → build/bin/studio/demo/**/<name> (each standalone)
+#    - studio/tests/*.cpp   → build/bin/studio/tests/test_runner (linked together)
 
-STUDIO_DEMO_SRC = $(wildcard studio/demo/*.cpp)
+STUDIO_DEMO_SRC = $(shell find studio/demo -name '*.cpp')
 STUDIO_DEMO_BIN = $(patsubst studio/demo/%.cpp,$(BIN_DIR)/studio/demo/%,$(STUDIO_DEMO_SRC))
 STUDIO_TEST_SRC = $(wildcard studio/tests/*.cpp)
 STUDIO_TEST_BIN = $(BIN_DIR)/studio/tests/test_runner
