@@ -10,30 +10,30 @@ namespace util {
 
 /// @brief High-resolution chronometer with pause/resume accumulation.
 class Chronometer {
-public:
-    Chronometer();
-    ~Chronometer() = default;
+ public:
+  Chronometer();
+  ~Chronometer() = default;
 
-    void start();
-    void stop();
-    void reset();
+  void start();
+  void stop();
+  void reset();
 
-    // Elapsed since start (or between start/stop), in various units
-    [[nodiscard]] double elapsedSeconds() const;
-    [[nodiscard]] double elapsedMilliseconds() const;
-    [[nodiscard]] double elapsedMicroseconds() const;
+  // Elapsed since start(or between start/stop), in various units
+  [[nodiscard]] double elapsedSeconds() const;
+  [[nodiscard]] double elapsedMilliseconds() const;
+  [[nodiscard]] double elapsedMicroseconds() const;
 
-    [[nodiscard]] bool isRunning() const;
+  [[nodiscard]] bool isRunning() const;
 
-private:
-    using Clock     = std::chrono::steady_clock;
-    using TimePoint = Clock::time_point;
-    using Duration  = std::chrono::duration<double>;
+ private:
+  using Clock = std::chrono::steady_clock;
+  using TimePoint = Clock::time_point;
+  using Duration = std::chrono::duration<double>;
 
-    TimePoint _start;
-    Duration  _accumulated;
-    bool      _running;
+  TimePoint _start;
+  Duration _accumulated;
+  bool _running;
 };
 
-} // namespace util
-} // namespace libcpp
+}  // namespace util
+}  // namespace libcpp

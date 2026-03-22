@@ -3,54 +3,54 @@
 //
 // Connects to a server, sends and receives Message objects.
 
-#include "libcpp/net/message.hpp"
 #include <functional>
 #include <map>
 #include <string>
 #include <thread>
+#include "libcpp/net/message.hpp"
 
 namespace libcpp {
 namespace net {
 
 /// @brief TCP client using POSIX sockets with length-prefix framing.
 class Client {
-public:
-    Client();
-    Client(const Client&) = delete;
-    Client& operator=(const Client&) = delete;
-    ~Client();
+ public:
+  Client();
+  Client(const Client&) = delete;
+  Client& operator=(const Client&) = delete;
+  ~Client();
 
-    // Connect to a remote server
-    void connect(const std::string& host, uint16_t port);
+  // Connect to a remote server
+  void connect(const std::string& host, uint16_t port);
 
-    // Disconnect from the server
-    void disconnect();
+  // Disconnect from the server
+  void disconnect();
 
-    // Send a message to the server
-    void send(const Message& msg);
+  // Send a message to the server
+  void send(const Message& msg);
 
-    // Register a handler for incoming messages of a given type
-    void registerHandler(MessageType type, std::function<void(Message&)> handler);
+  // Register a handler for incoming messages of a given type
+  void registerHandler(MessageType type, std::function<void(Message&)> handler);
 
-    // Start receiving messages in a background thread
-    void startReceiving();
+  // Start receiving messages in a background thread
+  void startReceiving();
 
-    bool isConnected() const;
+  bool isConnected() const;
 
-private:
-    void _receiveLoop();
+ private:
+  void _receiveLoop();
 
-    // Send raw bytes with a length prefix
-    static void _sendRaw(int fd, const std::vector<uint8_t>& data);
-    // Receive exactly n bytes
-    static bool _recvExact(int fd, uint8_t* buf, size_t n);
+  // Send raw bytes with a length prefix
+  static void _sendRaw(int fd, const std::vector<uint8_t>& data);
+  // Receive exactly n bytes
+  static bool _recvExact(int fd, uint8_t* buf, size_t n);
 
-    int              _sockFd    = -1;
-    bool             _connected = false;
-    bool             _receiving = false;
-    std::thread      _recvThread;
-    MessageConsumer  _consumer;
+  int _sockFd = -1;
+  bool _connected = false;
+  bool _receiving = false;
+  std::thread _recvThread;
+  MessageConsumer _consumer;
 };
 
-} // namespace net
-} // namespace libcpp
+}  // namespace net
+}  // namespace libcpp

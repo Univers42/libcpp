@@ -11,17 +11,15 @@
 /* ************************************************************************** */
 
 #ifndef LIBCPP_STR_FORMAT_HPP
-# define LIBCPP_STR_FORMAT_HPP
+#define LIBCPP_STR_FORMAT_HPP
 
-# include <string>
-# include <sstream>
+#include <sstream>
+#include <string>
 
-namespace libcpp
-{
-namespace str
-{
+namespace libcpp {
+namespace str {
 
-/* ── to_string helpers (C++98, no std::to_string) ──────────────────────── */
+/* ── to_string helpers(C++98, no std::to_string) ──────────────────────── */
 
 std::string to_string(int v);
 std::string to_string(long v);
@@ -41,15 +39,15 @@ std::string to_string(bool v);
 std::string fmt(const std::string& pattern);
 std::string fmt(const std::string& pattern, const std::string& a0);
 std::string fmt(const std::string& pattern, const std::string& a0,
-				const std::string& a1);
+                const std::string& a1);
 std::string fmt(const std::string& pattern, const std::string& a0,
-				const std::string& a1, const std::string& a2);
+                const std::string& a1, const std::string& a2);
 std::string fmt(const std::string& pattern, const std::string& a0,
-				const std::string& a1, const std::string& a2,
-				const std::string& a3);
+                const std::string& a1, const std::string& a2,
+                const std::string& a3);
 std::string fmt(const std::string& pattern, const std::string& a0,
-				const std::string& a1, const std::string& a2,
-				const std::string& a3, const std::string& a4);
+                const std::string& a1, const std::string& a2,
+                const std::string& a3, const std::string& a4);
 
 /* ── String manipulation ───────────────────────────────────────────────── */
 
@@ -60,41 +58,39 @@ std::string pad_left(const std::string& s, int width, char pad);
 std::string pad_right(const std::string& s, int width, char pad);
 std::string repeat(const std::string& s, int n);
 std::string join(const std::string* arr, int count, const std::string& sep);
-int         split(const std::string& s, char delim, std::string* out, int max);
-bool        starts_with(const std::string& s, const std::string& prefix);
-bool        ends_with(const std::string& s, const std::string& suffix);
+int split(const std::string& s, char delim, std::string* out, int max);
+bool starts_with(const std::string& s, const std::string& prefix);
+bool ends_with(const std::string& s, const std::string& suffix);
 std::string replace_all(const std::string& s, const std::string& from,
-						const std::string& to);
-bool        contains(const std::string& s, const std::string& sub);
-int         count(const std::string& s, const std::string& sub);
+                        const std::string& to);
+bool contains(const std::string& s, const std::string& sub);
+int count(const std::string& s, const std::string& sub);
 std::string reverse(const std::string& s);
 std::string center(const std::string& s, int width, char pad);
 std::string truncate(const std::string& s, int max_len,
-					 const std::string& suffix);
-bool        is_empty(const std::string& s);
-bool        is_blank(const std::string& s);
+                     const std::string& suffix);
+bool is_empty(const std::string& s);
+bool is_blank(const std::string& s);
 
-/* ── Message — streamable string builder (replaces old message.hpp) ────── */
+/* ── Message — streamable string builder(replaces old message.hpp) ────── */
 
-class Message
-{
-public:
-	Message();
-	Message(const Message& o);
-	Message& operator=(const Message& o);
-	~Message();
+class Message {
+ public:
+  Message();
+  Message(const Message& o);
+  Message& operator=(const Message& o);
+  ~Message();
 
-	template <typename T>
-	Message& operator<<(const T& val)
-	{
-		_ss << val;
-		return *this;
-	}
+  template <typename T>
+  Message& operator<<(const T& val) {
+    _ss << val;
+    return *this;
+  }
 
-	std::string str() const;
+  std::string str() const;
 
-private:
-	std::ostringstream _ss;
+ private:
+  std::ostringstream _ss;
 };
 
 } /* namespace str */

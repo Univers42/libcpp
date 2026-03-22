@@ -12,23 +12,23 @@ namespace math {
 
 /// @brief Classic 2D Perlin noise generator with octave layering.
 class PerlinNoise2D {
-public:
-    explicit PerlinNoise2D(uint64_t seed);
+ public:
+  explicit PerlinNoise2D(uint64_t seed);
 
-    // Sample noise at fractional coordinates, returns [-1, 1]
-    double sample(double x, double y) const;
+  // Sample noise at fractional coordinates, returns [-1, 1]
+  double sample(double x, double y) const;
 
-    // Multi-octave sampling
-    double octave(double x, double y, int octaves,
-                  double persistence = 0.5) const;
+  // Multi-octave sampling
+  double octave(double x, double y, int octaves,
+                double persistence = 0.5) const;
 
-private:
-    static double _fade(double t);
-    static double _lerp(double a, double b, double t);
-    static double _grad(int hash, double x, double y);
+ private:
+  static double _fade(double t);
+  static double _lerp(double a, double b, double t);
+  static double _grad(int hash, double x, double y);
 
-    std::vector<int> _perm; // permutation table (size 512)
+  std::vector<int> _perm;  // permutation table(size 512)
 };
 
-} // namespace math
-} // namespace libcpp
+}  // namespace math
+}  // namespace libcpp

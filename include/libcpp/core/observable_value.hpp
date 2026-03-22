@@ -14,59 +14,52 @@ namespace core {
 /// @brief Observable value that notifies subscribers on change.
 template <typename TType>
 class ObservableValue {
-public:
-    using Callback = std::function<void(const TType& newVal)>;
+ public:
+  using Callback = std::function<void(const TType& newVal)>;
 
-    ObservableValue() = default;
-    explicit ObservableValue(const TType& initial) : _value(initial) {}
-    ~ObservableValue() = default;
+  ObservableValue() = default;
+  explicit ObservableValue(const TType& initial) : _value(initial) {}
+  ~ObservableValue() = default;
 
-    // Get the current value
-    [[nodiscard]] const TType& get() const { return _value; }
-    operator const TType&() const { return _value; }
+  // Get the current value
+  [[nodiscard]] const TType& get() const { return _value; }
+  operator const TType&() const { return _value; }
 
-    // Set a new value (notifies all observers if changed)
-    void set(const TType& val)
-    {
-        std::lock_guard<std::mutex> lock(_mtx);
-        if (_value == val)
-            return;
-        _value = val;
-        for (const auto& cb : _callbacks)
-            cb(_value);
-    }
+  // Set a new value(notifies all observers if changed)
+  void set(const TType& val) {
+    std::lock_guard<std::mutex> lock(_mtx);
+    if (_value == val) return;
+    _value = val;
+    for (const auto& cb : _callbacks) cb(_value);
+  }
 
-    ObservableValue& operator=(const TType& val)
-    {
-        set(val);
-        return *this;
-    }
+  ObservableValue& operator=(const TType& val) {
+    set(val);
+    return *this;
+  }
 
-    // Subscribe to changes
-    void subscribe(Callback cb)
-    {
-        std::lock_guard<std::mutex> lock(_mtx);
-        _callbacks.push_back(std::move(cb));
-    }
+  // Subscribe to changes
+  void subscribe(Callback cb) {
+    std::lock_guard<std::mutex> lock(_mtx);
+    _callbacks.push_back(std::move(cb));
+  }
 
-    // Remove all subscribers
-    void clearSubscribers()
-    {
-        std::lock_guard<std::mutex> lock(_mtx);
-        _callbacks.clear();
-    }
+  // Remove all subscribers
+  void clearSubscribers() {
+    std::lock_guard<std::mutex> lock(_mtx);
+    _callbacks.clear();
+  }
 
-    size_t subscriberCount() const
-    {
-        std::lock_guard<std::mutex> lock(_mtx);
-        return _callbacks.size();
-    }
+  size_t subscriberCount() const {
+    std::lock_guard<std::mutex> lock(_mtx);
+    return _callbacks.size();
+  }
 
-private:
-    TType                  _value{};
-    std::vector<Callback>  _callbacks;
-    mutable std::mutex     _mtx;
+ private:
+  TType _value{};
+  std::vector<Callback> _callbacks;
+  mutable std::mutex _mtx;
 };
 
-} // namespace core
-} // namespace libcpp
+}  // namespace core
+}  // namespace libcpp

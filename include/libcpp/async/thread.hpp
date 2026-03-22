@@ -14,33 +14,33 @@ namespace async {
 
 /// @brief Named thread wrapper with callback and threadSafeCout prefix.
 class Thread {
-public:
-    Thread();
-    Thread(const Thread&) = delete;
-    Thread& operator=(const Thread&) = delete;
-    ~Thread();
+ public:
+  Thread();
+  Thread(const Thread&) = delete;
+  Thread& operator=(const Thread&) = delete;
+  ~Thread();
 
-    // Set the name of this thread (used as cout prefix)
-    void setName(const std::string& name);
-    const std::string& name() const;
+  // Set the name of this thread(used as cout prefix)
+  void setName(const std::string& name);
+  const std::string& name() const;
 
-    // Set the callback to execute
-    void setCallback(std::function<void()> callback);
+  // Set the callback to execute
+  void setCallback(std::function<void()> callback);
 
-    // Launch the thread (throws if already running or no callback set)
-    void start();
+  // Launch the thread(throws if already running or no callback set)
+  void start();
 
-    // Request stop and join the thread
-    void stop();
+  // Request stop and join the thread
+  void stop();
 
-    bool isRunning() const;
+  bool isRunning() const;
 
-private:
-    std::string           _name;
-    std::function<void()> _callback;
-    std::thread           _thread;
-    std::atomic<bool>     _running{false};
+ private:
+  std::string _name;
+  std::function<void()> _callback;
+  std::thread _thread;
+  std::atomic<bool> _running{false};
 };
 
-} // namespace async
-} // namespace libcpp
+}  // namespace async
+}  // namespace libcpp

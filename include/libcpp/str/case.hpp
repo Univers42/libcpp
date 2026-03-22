@@ -11,16 +11,14 @@
 /* ************************************************************************** */
 
 #ifndef LIBCPP_STR_CASE_HPP
-# define LIBCPP_STR_CASE_HPP
+#define LIBCPP_STR_CASE_HPP
 
-# include <string>
+#include <string>
 
-namespace libcpp
-{
-namespace str
-{
+namespace libcpp {
+namespace str {
 
-/* ── Case conversion (UTF-8 aware) ─────────────────────────────────────── */
+/* ── Case conversion(UTF-8 aware) ─────────────────────────────────────── */
 
 std::string to_upper(const std::string& s);
 std::string to_lower(const std::string& s);
