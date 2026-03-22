@@ -1,21 +1,21 @@
 # ══════════════════════════════════════════════════════════════════════════════
-#  libcpp / libftpp — C++17 utility & systems library
+#  libftpp — C++17 utility & systems library
 #
 #  Targets:
-#    make          → build/lib/libcpp.a  + build/lib/libftpp.a  (static)
-#    make shared   → build/lib/libcpp.so + build/lib/libftpp.so (shared)
+#    make          → build/lib/libftpp.a          (static)
+#    make shared   → build/lib/libftpp.so         (shared)
 #    make both     → static + shared
 #
 #  Build tree:
 #    build/obj/    — position-independent object files (usable for both .a/.so)
 #    build/dep/    — auto-generated header dependency files (.d)
-#    build/lib/    — static (.a) and/or shared (.so) libraries
+#    build/lib/    — libftpp.a and/or libftpp.so
 #    build/bin/    — demo and test binaries
 #
 #  Usage (static):
-#    $(CXX) ... -Lpath/to/libcpp/build/lib -Ipath/to/libcpp/include -lcpp
+#    $(CXX) ... -Lpath/to/libftpp/build/lib -Ipath/to/libftpp/include -lftpp
 #  Usage (shared, runtime path baked in):
-#    $(CXX) ... -Lbuild/lib -Wl,-rpath,build/lib -lcpp
+#    $(CXX) ... -Lbuild/lib -Wl,-rpath,build/lib -lftpp
 # ══════════════════════════════════════════════════════════════════════════════
 
 CXX      = c++
@@ -30,13 +30,9 @@ DEP_DIR   = $(BUILD_DIR)/dep
 LIB_DIR   = $(BUILD_DIR)/lib
 BIN_DIR   = $(BUILD_DIR)/bin
 
-# Static libraries
-NAME   = $(LIB_DIR)/libcpp.a
-FTNAME = $(LIB_DIR)/libftpp.a
-
-# Shared libraries
-SONAME   = $(LIB_DIR)/libcpp.so
-FTSONAME = $(LIB_DIR)/libftpp.so
+# Library names — libftpp only
+NAME   = $(LIB_DIR)/libftpp.a
+SONAME = $(LIB_DIR)/libftpp.so
 
 # Parallel jobs — use all available cores
 MAKEFLAGS += -j$(shell nproc) --no-print-directory
@@ -57,29 +53,21 @@ RED    = \033[91m
 
 # ── Targets ──────────────────────────────────────────────────────────────────
 
-all: $(NAME) $(FTNAME)
+all: $(NAME)
 
-shared: $(SONAME) $(FTSONAME)
+shared: $(SONAME)
 
 both: all shared
 
-# Static archives
+# Static archive
 $(NAME): $(BUILD_STAMP) $(OBJ)
 	@$(AR) $@ $(OBJ)
 	@printf "  $(GREEN)●$(RESET) $(BOLD)$(notdir $(NAME))$(RESET) $(DIM)archived ($(words $(OBJ)) objects)$(RESET)\n"
 
-$(FTNAME): $(NAME)
-	@cp $(NAME) $(FTNAME)
-	@printf "  $(GREEN)●$(RESET) $(BOLD)$(notdir $(FTNAME))$(RESET) $(DIM)(alias of $(notdir $(NAME)))$(RESET)\n"
-
-# Shared libraries  (-shared + SONAME baked in)
+# Shared library (-shared + SONAME baked in)
 $(SONAME): $(BUILD_STAMP) $(OBJ)
 	@$(CXX) -shared -Wl,-soname,$(notdir $(SONAME)) $(OBJ) -o $@
 	@printf "  $(GREEN)●$(RESET) $(BOLD)$(notdir $(SONAME))$(RESET) $(DIM)linked ($(words $(OBJ)) objects)$(RESET)\n"
-
-$(FTSONAME): $(SONAME)
-	@cp $(SONAME) $(FTSONAME)
-	@printf "  $(GREEN)●$(RESET) $(BOLD)$(notdir $(FTSONAME))$(RESET) $(DIM)(alias of $(notdir $(SONAME)))$(RESET)\n"
 
 # Pre-create the full obj/dep mirror of src/ before any parallel compile job runs
 SRC_DIRS   = $(sort $(dir $(SRC)))
@@ -123,7 +111,7 @@ TEST_BIN = $(BIN_DIR)/test_runner
 
 test: $(NAME)
 	@mkdir -p $(BIN_DIR)
-	@$(CXX) $(CXXFLAGS) $(TEST_SRC) -L$(LIB_DIR) -l:libcpp.a -o $(TEST_BIN)
+	@$(CXX) $(CXXFLAGS) $(TEST_SRC) -L$(LIB_DIR) -l:libftpp.a -o $(TEST_BIN)
 	@$(TEST_BIN)
 
 # ── Demo ─────────────────────────────────────────────────────────────────────
@@ -133,7 +121,7 @@ DEMO_BIN = $(BIN_DIR)/demo_libftpp
 
 demo: $(NAME)
 	@mkdir -p $(BIN_DIR)
-	@$(CXX) $(CXXFLAGS) -I. $(DEMO_SRC) -L$(LIB_DIR) -l:libcpp.a -o $(DEMO_BIN)
+	@$(CXX) $(CXXFLAGS) -I. $(DEMO_SRC) -L$(LIB_DIR) -l:libftpp.a -o $(DEMO_BIN)
 	@$(DEMO_BIN)
 
 # ── compile_studio ───────────────────────────────────────────────────────────
@@ -168,12 +156,12 @@ run_tests: compile_studio
 $(BIN_DIR)/studio/demo/%: studio/demo/%.cpp $(NAME)
 	@mkdir -p $(dir $@)
 	@printf "  $(DIM)studio/demo$(RESET)  $(CYAN)%-30s$(RESET)\n" "$(notdir $<)"
-	@$(CXX) $(CXXFLAGS) $< -L$(LIB_DIR) -l:libcpp.a -o $@
+	@$(CXX) $(CXXFLAGS) $< -L$(LIB_DIR) -l:libftpp.a -o $@
 
 $(STUDIO_TEST_BIN): $(STUDIO_TEST_SRC) $(NAME)
 	@mkdir -p $(dir $@)
 	@printf "  $(DIM)studio/tests$(RESET) $(CYAN)%-30s$(RESET)\n" "test_runner"
-	@$(CXX) $(CXXFLAGS) $(STUDIO_TEST_SRC) -L$(LIB_DIR) -l:libcpp.a -o $@
+	@$(CXX) $(CXXFLAGS) $(STUDIO_TEST_SRC) -L$(LIB_DIR) -l:libftpp.a -o $@
 
 # ── Stats ────────────────────────────────────────────────────────────────────
 
