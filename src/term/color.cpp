@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "libcpp/term/color.hpp"
+#include <vector>
 
 namespace libcpp
 {
@@ -357,14 +358,27 @@ std::string Gradient::apply(const std::string& text) const
 {
 	if (text.empty() || _stops.empty())
 		return text;
+	/* collect UTF-8 codepoints */
+	std::vector<std::string> cps;
+	for (std::size_t i = 0; i < text.size(); )
+	{
+		unsigned char c = (unsigned char)text[i];
+		int nb = 1;
+		if      (c >= 0xF0) nb = 4;
+		else if (c >= 0xE0) nb = 3;
+		else if (c >= 0xC0) nb = 2;
+		if (i + nb > text.size()) nb = 1;
+		cps.push_back(text.substr(i, nb));
+		i += nb;
+	}
 	std::string out;
-	std::size_t len = text.size();
+	std::size_t len = cps.size();
 	for (std::size_t i = 0; i < len; ++i)
 	{
 		double t = (len > 1) ? (double)i / (len - 1) : 0.5;
 		Srgb c = at(t);
 		out += c.to_ansi_fg();
-		out += text[i];
+		out += cps[i];
 	}
 	out += "\033[0m";
 	return out;

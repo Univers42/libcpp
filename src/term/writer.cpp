@@ -6,166 +6,784 @@
 /*   By: dlesieur <dlesieur@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/21 00:00:00 by dlesieur          #+#    #+#             */
-/*   Updated: 2026/03/21 21:47:01 by dlesieur         ###   ########.fr       */
+/*   Updated: 2026/03/22 10:00:00 by dlesieur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libcpp/term/writer.hpp"
-#include <sstream>
 
 namespace libcpp
 {
 
-/* ══════════════════════════════════════════════════════════════════════════
- *  TermWriter — OCF
- * ═════════════════════════════════════════════════════════════════════════ */
+/* ======================================================================
+ *  OCF
+ * ====================================================================== */
 
 TermWriter::TermWriter()
-	: _ts(0), _os(&std::cout), _owns_ts(true)
-{
-	_ts = new TermStyle();
-}
+: _ts(new TermStyle()), _os(&std::cout), _owns_ts(true),
+  _callout_count(0), _in_callout(false), _callout_line_count(0),
+  _in_table(false), _pending_table(0), _table_has_header(false)
+{ _register_default_callouts(); }
 
 TermWriter::TermWriter(TermStyle& ts)
-	: _ts(&ts), _os(&std::cout), _owns_ts(false) {}
+: _ts(&ts), _os(&std::cout), _owns_ts(false),
+  _callout_count(0), _in_callout(false), _callout_line_count(0),
+  _in_table(false), _pending_table(0), _table_has_header(false)
+{ _register_default_callouts(); }
 
 TermWriter::TermWriter(TermStyle& ts, std::ostream& os)
-	: _ts(&ts), _os(&os), _owns_ts(false) {}
+: _ts(&ts), _os(&os), _owns_ts(false),
+  _callout_count(0), _in_callout(false), _callout_line_count(0),
+  _in_table(false), _pending_table(0), _table_has_header(false)
+{ _register_default_callouts(); }
 
 TermWriter::TermWriter(const TermWriter& o)
-	: _ts(0), _os(o._os), _callouts(o._callouts), _owns_ts(o._owns_ts)
+: _ts(0), _os(o._os), _owns_ts(o._owns_ts),
+  _callout_count(o._callout_count), _in_callout(false),
+  _callout_line_count(0), _in_table(false), _pending_table(0),
+  _table_has_header(false), _table_style(o._table_style)
 {
-	if (_owns_ts && o._ts)
-		_ts = new TermStyle(*o._ts);
-	else
-		_ts = o._ts;
+if (_owns_ts && o._ts)
+_ts = new TermStyle(*o._ts);
+else
+_ts = o._ts;
+for (int i = 0; i < _callout_count; ++i)
+_callouts[i] = o._callouts[i];
 }
 
 TermWriter& TermWriter::operator=(const TermWriter& o)
 {
-	if (this != &o)
-	{
-		if (_owns_ts)
-			delete _ts;
-		_os = o._os;
-		_callouts = o._callouts;
-		_owns_ts = o._owns_ts;
-		if (_owns_ts && o._ts)
-			_ts = new TermStyle(*o._ts);
-		else
-			_ts = o._ts;
-	}
-	return *this;
+if (this != &o)
+{
+if (_owns_ts) delete _ts;
+delete _pending_table;
+_os = o._os;
+_owns_ts = o._owns_ts;
+if (_owns_ts && o._ts) _ts = new TermStyle(*o._ts);
+else _ts = o._ts;
+_callout_count = o._callout_count;
+for (int i = 0; i < _callout_count; ++i)
+_callouts[i] = o._callouts[i];
+_in_callout = false; _callout_line_count = 0;
+_in_table = false; _pending_table = 0; _table_has_header = false;
+_table_style = o._table_style;
+_buf.str(""); _buf.clear();
+}
+return *this;
 }
 
 TermWriter::~TermWriter()
 {
-	if (_owns_ts)
-		delete _ts;
+if (_owns_ts) delete _ts;
+delete _pending_table;
 }
 
-/* ── API ───────────────────────────────────────────────────────────────── */
+/* ======================================================================
+ *  Callout registry
+ * ====================================================================== */
+
+void TermWriter::define_callout(const std::string& name, const ElemStyle& style)
+{
+for (int i = 0; i < _callout_count; ++i)
+{
+if (_callouts[i].name == name)
+{
+_callouts[i].es = style;
+return;
+}
+}
+if (_callout_count < MAX_CALLOUTS)
+{
+_callouts[_callout_count].name = name;
+_callouts[_callout_count].es   = style;
+_callouts[_callout_count].used = true;
+++_callout_count;
+}
+}
+
+ElemStyle* TermWriter::get_callout(const std::string& name)
+{
+for (int i = 0; i < _callout_count; ++i)
+if (_callouts[i].name == name) return &_callouts[i].es;
+return 0;
+}
+
+const ElemStyle* TermWriter::get_callout(const std::string& name) const
+{
+for (int i = 0; i < _callout_count; ++i)
+if (_callouts[i].name == name) return &_callouts[i].es;
+return 0;
+}
+
+/* ======================================================================
+ *  Internal helpers
+ * ====================================================================== */
+
+void TermWriter::_emit(const std::string& s) { *_os << s << "\n"; _buf << s << "\n"; }
+
+void TermWriter::_register_default_callouts()
+{
+/* tip — green tint */
+{
+ElemStyle e;
+e.fg     = Srgb(160, 230, 160);
+e.bg     = Srgb( 12,  30,  18);
+e.border = Srgb( 60, 200, 100);
+e.glyph  = Glyph::CHECK;
+e.has_bg = true; e.font = FONT_NONE;
+e.width  = 60; e.pad_l = 1; e.pad_r = 1; e.margin_l = 1;
+define_callout("tip", e);
+}
+/* note — blue tint */
+{
+ElemStyle e;
+e.fg     = Srgb(170, 200, 240);
+e.bg     = Srgb( 12,  18,  35);
+e.border = Srgb( 70, 130, 230);
+e.glyph  = Glyph::INFO;
+e.has_bg = true; e.font = FONT_NONE;
+e.width  = 60; e.pad_l = 1; e.pad_r = 1; e.margin_l = 1;
+define_callout("note", e);
+}
+/* warning — amber tint */
+{
+ElemStyle e;
+e.fg     = Srgb(240, 210, 140);
+e.bg     = Srgb( 35,  28,  10);
+e.border = Srgb(230, 170, 40);
+e.glyph  = Glyph::WARN;
+e.has_bg = true; e.font = FONT_NONE;
+e.width  = 60; e.pad_l = 1; e.pad_r = 1; e.margin_l = 1;
+define_callout("warning", e);
+}
+/* danger — red tint */
+{
+ElemStyle e;
+e.fg     = Srgb(240, 170, 160);
+e.bg     = Srgb( 38,  12,  12);
+e.border = Srgb(220,  60,  60);
+e.glyph  = Glyph::SKULL;
+e.has_bg = true; e.font = FONT_NONE;
+e.width  = 60; e.pad_l = 1; e.pad_r = 1; e.margin_l = 1;
+define_callout("danger", e);
+}
+/* important — purple tint */
+{
+ElemStyle e;
+e.fg     = Srgb(200, 180, 240);
+e.bg     = Srgb( 25,  15,  38);
+e.border = Srgb(160, 100, 230);
+e.glyph  = Glyph::DIAMOND;
+e.has_bg = true; e.font = FONT_NONE;
+e.width  = 60; e.pad_l = 1; e.pad_r = 1; e.margin_l = 1;
+define_callout("important", e);
+}
+/* success — bright green tint */
+{
+ElemStyle e;
+e.fg     = Srgb(140, 240, 170);
+e.bg     = Srgb( 10,  32,  15);
+e.border = Srgb( 40, 210, 100);
+e.glyph  = Glyph::CHECK;
+e.has_bg = true; e.font = FONT_NONE;
+e.width  = 60; e.pad_l = 1; e.pad_r = 1; e.margin_l = 1;
+define_callout("success", e);
+}
+/* error — bright red tint */
+{
+ElemStyle e;
+e.fg     = Srgb(255, 160, 150);
+e.bg     = Srgb( 40,  10,  10);
+e.border = Srgb(255,  70,  60);
+e.glyph  = Glyph::CROSS;
+e.has_bg = true; e.font = FONT_NONE;
+e.width  = 60; e.pad_l = 1; e.pad_r = 1; e.margin_l = 1;
+define_callout("error", e);
+}
+/* info — cyan tint */
+{
+ElemStyle e;
+e.fg     = Srgb(160, 220, 240);
+e.bg     = Srgb( 10,  25,  35);
+e.border = Srgb( 50, 180, 220);
+e.glyph  = Glyph::INFO;
+e.has_bg = true; e.font = FONT_NONE;
+e.width  = 60; e.pad_l = 1; e.pad_r = 1; e.margin_l = 1;
+define_callout("info", e);
+}
+}
+
+std::string TermWriter::_render_callout(
+const ElemStyle& es, const std::string& label,
+const std::string* lines, int count) const
+{
+/*
+** Obsidian-style callout:
+**
+**   ┃  ⚠  Title                          ┃   ← header: border-colored bar + glyph + bold label
+**   ┃     Body line 1                     ┃   ← body:   bar + indented content
+**   ┃     Body line 2                     ┃
+**
+** The entire block has a tinted background.
+** The left bar uses the border color.
+** Header uses border color (bold).
+** Body uses fg color.
+*/
+
+int w = es.width > 0 ? es.width : 60;
+int inner_w = w - 2;  /* left bar(2) */
+if (inner_w < 10) inner_w = 10;
+
+std::string rst = TermUtils::reset();
+std::string sp  = TermUtils::spaces(es.margin_l);
+std::string bar = TermUtils::apply_fg(es.border) + std::string(" \xe2\x94\x83 ") + rst;
+
+/* measure bar visual width = 3 ( space, ┃, space ) */
+int bar_vis = 3;
+int content_w = inner_w - bar_vis;
+if (content_w < 5) content_w = 5;
+
+std::string r;
+r += TermUtils::newlines(es.space_before);
+
+/* top blank line with bg */
+if (es.has_bg)
+{
+r += sp;
+r += TermUtils::apply_bg(es.bg);
+r += TermUtils::apply_fg(es.border);
+r += std::string(" \xe2\x94\x83") + TermUtils::spaces(w - 2) + rst + "\n";
+}
+
+/* header line: bar + glyph + label */
+{
+r += sp;
+if (es.has_bg) r += TermUtils::apply_bg(es.bg);
+r += TermUtils::apply_fg(es.border);
+r += std::string(" \xe2\x94\x83 ");
+r += TermUtils::apply_font(FONT_BOLD);
+r += es.glyph + label;
+int used = TermUtils::vis_len(es.glyph) + TermUtils::vis_len(label);
+int pad = content_w - used;
+if (pad > 0) r += TermUtils::spaces(pad);
+r += rst + "\n";
+}
+
+/* body lines */
+for (int i = 0; i < count; ++i)
+{
+if (lines[i].empty()) continue;
+r += sp;
+if (es.has_bg) r += TermUtils::apply_bg(es.bg);
+r += TermUtils::apply_fg(es.border);
+r += std::string(" \xe2\x94\x83 ");
+r += TermUtils::apply_fg(es.fg);
+r += TermUtils::apply_font(es.font);
+/* indent body by glyph width to align with header text */
+int gw = TermUtils::vis_len(es.glyph);
+r += TermUtils::spaces(gw);
+r += lines[i];
+int used = gw + TermUtils::vis_len(lines[i]);
+int pad = content_w - used;
+if (pad > 0) r += TermUtils::spaces(pad);
+r += rst + "\n";
+}
+
+/* bottom blank line with bg */
+if (es.has_bg)
+{
+r += sp;
+r += TermUtils::apply_bg(es.bg);
+r += TermUtils::apply_fg(es.border);
+r += std::string(" \xe2\x94\x83") + TermUtils::spaces(w - 2) + rst + "\n";
+}
+
+r += TermUtils::newlines(es.space_after);
+return r;
+}
+
+/* ======================================================================
+ *  Imperative API
+ * ====================================================================== */
+
+TermWriter& TermWriter::h1(const std::string& t)       { _emit(_ts->h1(t)); return *this; }
+TermWriter& TermWriter::h2(const std::string& t)       { _emit(_ts->h2(t)); return *this; }
+TermWriter& TermWriter::h3(const std::string& t)       { _emit(_ts->h3(t)); return *this; }
+TermWriter& TermWriter::text(const std::string& m)     { _emit(_ts->text(m)); return *this; }
+TermWriter& TermWriter::bold(const std::string& m)     { _emit(_ts->bold(m)); return *this; }
+TermWriter& TermWriter::italic(const std::string& m)   { _emit(_ts->italic(m)); return *this; }
+TermWriter& TermWriter::dim(const std::string& m)      { _emit(_ts->dim(m)); return *this; }
+TermWriter& TermWriter::underline(const std::string& m){ _emit(_ts->underline(m)); return *this; }
+TermWriter& TermWriter::strike(const std::string& m)   { _emit(_ts->strike(m)); return *this; }
+TermWriter& TermWriter::quote(const std::string& m)    { _emit(_ts->quote(m)); return *this; }
+TermWriter& TermWriter::info(const std::string& m)     { _emit(_ts->info(m)); return *this; }
+TermWriter& TermWriter::warn(const std::string& m)     { _emit(_ts->warn(m)); return *this; }
+TermWriter& TermWriter::error(const std::string& m)    { _emit(_ts->error(m)); return *this; }
+TermWriter& TermWriter::success(const std::string& m)  { _emit(_ts->success(m)); return *this; }
+TermWriter& TermWriter::danger(const std::string& m)   { _emit(_ts->danger(m)); return *this; }
+TermWriter& TermWriter::trace(const std::string& m)    { _emit(_ts->trace(m)); return *this; }
+TermWriter& TermWriter::bullet(const std::string& m)   { _emit(_ts->bullet(m)); return *this; }
+TermWriter& TermWriter::ordered(int n, const std::string& m) { _emit(_ts->ordered(n, m)); return *this; }
+TermWriter& TermWriter::sep()  { _emit(_ts->separator()); return *this; }
+TermWriter& TermWriter::hr()   { _emit(_ts->hr()); return *this; }
+TermWriter& TermWriter::nl()   { *_os << "\n"; _buf << "\n"; return *this; }
+
+TermWriter& TermWriter::section(const std::string& t, const std::string& b)
+{
+_emit(_ts->section(t, b));
+return *this;
+}
+
+/* -- named callout ---------------------------------------------------- */
+TermWriter& TermWriter::callout(const std::string& type,
+const std::string& l1, const std::string& l2, const std::string& l3,
+const std::string& l4, const std::string& l5, const std::string& l6,
+const std::string& l7, const std::string& l8, const std::string& l9,
+const std::string& l10)
+{
+const std::string arr[10] = {l1,l2,l3,l4,l5,l6,l7,l8,l9,l10};
+int count = 0;
+for (int i = 0; i < 10; ++i)
+if (!arr[i].empty()) count = i + 1;
+
+const ElemStyle* custom = get_callout(type);
+if (custom)
+_emit(_render_callout(*custom, type, arr, count));
+else
+_emit(_render_callout(_ts->callout_style, type, arr, count));
+return *this;
+}
+
+/* -- table (imperative) ----------------------------------------------- */
+TermWriter& TermWriter::table(const Table& t)
+{
+std::string rendered = t.render();
+if (!rendered.empty() && rendered[rendered.size() - 1] == '\n')
+rendered.erase(rendered.size() - 1);
+_emit(rendered);
+return *this;
+}
+
+TableStyle& TermWriter::table_style() { return _table_style; }
+const TableStyle& TermWriter::table_style() const { return _table_style; }
+
+/* ======================================================================
+ *  Output
+ * ====================================================================== */
+
+std::string TermWriter::str() const { return _buf.str(); }
+
+void TermWriter::flush()
+{
+if (_in_callout) _flush_callout();
+if (_in_table)   _flush_table();
+_os->flush();
+_buf.str(""); _buf.clear();
+}
+
+void TermWriter::clear() { _buf.str(""); _buf.clear(); }
+
+TermStyle& TermWriter::style() { return *_ts; }
+const TermStyle& TermWriter::style() const { return *_ts; }
+
+/* ======================================================================
+ *  Simple direct-write API (non-buffered, backward compat)
+ * ====================================================================== */
 
 void TermWriter::write(const std::string& markdown)
 {
-	std::istringstream iss(markdown);
-	std::string line;
-	while (std::getline(iss, line))
-		_parse_line(line);
+std::istringstream iss(markdown);
+std::string line;
+while (std::getline(iss, line))
+_parse_line(line);
+if (_in_callout) _flush_callout();
+if (_in_table)   _flush_table();
 }
 
 void TermWriter::writeln(const std::string& markdown)
 {
-	write(markdown);
-	*_os << "\n";
+write(markdown);
+*_os << "\n";
 }
 
-void TermWriter::nl() { *_os << "\n"; }
+void TermWriter::write_raw(const std::string& txt) { *_os << txt; }
 
-void TermWriter::write_raw(const std::string& text) { *_os << text; }
+/* ======================================================================
+ *  Markdown parser
+ * ====================================================================== */
 
-void TermWriter::hr(int width, char ch)
+TermWriter& TermWriter::parse(const std::string& markdown)
 {
-	*_os << std::string(width, ch) << "\n";
+std::istringstream iss(markdown);
+std::string line;
+while (std::getline(iss, line))
+_parse_line(line);
+if (_in_callout) _flush_callout();
+if (_in_table)   _flush_table();
+return *this;
 }
 
-void TermWriter::define_callout(const std::string& name, const ElemStyle& style)
+TermWriter& TermWriter::parse_file(const std::string& path)
 {
-	_callouts[name] = style;
+std::ifstream ifs(path.c_str());
+if (!ifs.is_open())
+{
+error("parse_file: cannot open \"" + path + "\"");
+return *this;
+}
+std::string line;
+while (std::getline(ifs, line))
+_parse_line(line);
+if (_in_callout) _flush_callout();
+if (_in_table)   _flush_table();
+return *this;
 }
 
-/* ── parsing ───────────────────────────────────────────────────────────── */
+/* ======================================================================
+ *  operator<< -- stream-style line feeder
+ * ====================================================================== */
 
-void TermWriter::_parse_line(const std::string& line)
+TermWriter& TermWriter::operator<<(const std::string& line)
 {
-	if (!_ts) return;
+if (line.find('\n') != std::string::npos)
+{
+std::istringstream iss(line);
+std::string sub;
+while (std::getline(iss, sub))
+_parse_line(sub);
+}
+else
+_parse_line(line);
+return *this;
+}
 
-	std::string trimmed = _trim(line);
+TermWriter& TermWriter::operator<<(const char* line)
+{
+return *this << std::string(line);
+}
 
-	if (trimmed.empty())
+/* ======================================================================
+ *  Static helpers
+ * ====================================================================== */
+
+bool TermWriter::_starts_with(const std::string& s, const std::string& p)
+{
+if (p.size() > s.size()) return false;
+return s.compare(0, p.size(), p) == 0;
+}
+
+std::string TermWriter::_strip_prefix(const std::string& s, std::size_t n)
+{
+std::size_t i = n;
+while (i < s.size() && s[i] == ' ') ++i;
+return s.substr(i);
+}
+
+std::string TermWriter::_ltrim(const std::string& s)
+{
+std::size_t i = 0;
+while (i < s.size() && s[i] == ' ') ++i;
+return s.substr(i);
+}
+
+bool TermWriter::_is_repeated(const std::string& s, char c)
+{
+if (s.empty()) return false;
+for (std::size_t i = 0; i < s.size(); ++i)
+if (s[i] != c) return false;
+return true;
+}
+
+bool TermWriter::_is_ordered(const std::string& s, int& num, std::string& rest)
+{
+std::size_t i = 0;
+while (i < s.size() && s[i] >= '0' && s[i] <= '9') ++i;
+if (i == 0 || i >= s.size()) return false;
+if (s[i] != '.') return false;
+std::istringstream iss(s.substr(0, i));
+iss >> num;
+rest = _strip_prefix(s, i + 1);
+return true;
+}
+
+/* ======================================================================
+ *  Table helpers
+ * ====================================================================== */
+
+bool TermWriter::_is_table_line(const std::string& line)
+{
+if (line.empty() || line[0] != '|') return false;
+if (line[line.size() - 1] != '|')   return false;
+return true;
+}
+
+bool TermWriter::_is_sep_line(const std::string& line)
+{
+if (!_is_table_line(line)) return false;
+for (std::string::size_type i = 1; i < line.size() - 1; ++i)
 	{
-		*_os << "\n";
-		return;
-	}
+		char c = line[i];
+		if (c != '-' && c != '|' && c != ':' && c != ' ') return false;
+}
+return true;
+}
 
-	/* headings */
-	if (_starts_with(trimmed, "### "))
-		*_os << _ts->h3(trimmed.substr(4));
-	else if (_starts_with(trimmed, "## "))
-		*_os << _ts->h2(trimmed.substr(3));
-	else if (_starts_with(trimmed, "# "))
-		*_os << _ts->h1(trimmed.substr(2));
-	/* blockquote */
-	else if (_starts_with(trimmed, "> "))
-		*_os << _ts->quote(trimmed.substr(2));
-	/* horizontal rule */
-	else if (trimmed == "---" || trimmed == "***" || trimmed == "___")
-		*_os << _ts->hr();
-	/* info/warn/error markers */
-	else if (_starts_with(trimmed, "[info] "))
-		*_os << _ts->info(trimmed.substr(7));
-	else if (_starts_with(trimmed, "[warn] "))
-		*_os << _ts->warn(trimmed.substr(7));
-	else if (_starts_with(trimmed, "[error] "))
-		*_os << _ts->error(trimmed.substr(8));
-	/* callout */
-	else if (_starts_with(trimmed, "[!") && trimmed.find(']') != std::string::npos)
+int TermWriter::_split_pipe(const std::string& line, std::string* out, int max_cols)
+{
+int count = 0;
+std::string::size_type start = 0;
+if (!line.empty() && line[0] == '|') start = 1;
+	while (start < line.size() && count < max_cols)
 	{
-		std::size_t end = trimmed.find(']');
-		std::string name = trimmed.substr(2, end - 2);
-		std::string body = (end + 1 < trimmed.size()) ? _trim(trimmed.substr(end + 1)) : "";
-		std::map<std::string, ElemStyle>::const_iterator it = _callouts.find(name);
-		if (it != _callouts.end())
-		{
-			*_os << TermUtils::apply_fg(it->second.fg)
-				 << TermUtils::apply_font(it->second.font);
-			if (!it->second.glyph.empty())
-				*_os << it->second.glyph;
-			*_os << body << TermUtils::reset() << "\n";
-		}
-		else
-			*_os << trimmed << "\n";
-	}
-	/* plain text */
-	else
-		*_os << trimmed << "\n";
+		std::string::size_type pipe = line.find('|', start);
+if (pipe == std::string::npos) break;
+		std::string cell = line.substr(start, pipe - start);
+		std::string::size_type a = cell.find_first_not_of(' ');
+std::string::size_type b = cell.find_last_not_of(' ');
+if (a != std::string::npos && b != std::string::npos)
+out[count] = cell.substr(a, b - a + 1);
+else
+out[count] = "";
+++count;
+start = pipe + 1;
+}
+return count;
 }
 
-bool TermWriter::_starts_with(const std::string& s, const std::string& prefix) const
+/* ======================================================================
+ *  _parse_line -- the core markdown line dispatcher
+ * ====================================================================== */
+
+void TermWriter::_parse_line(const std::string& raw)
 {
-	if (s.size() < prefix.size()) return false;
-	return s.substr(0, prefix.size()) == prefix;
+if (!_ts) return;
+std::string line = _ltrim(raw);
+
+/* inside a callout block? */
+if (_in_callout)
+{
+if (_starts_with(line, "> "))
+{
+if (_callout_line_count < 10)
+_callout_lines[_callout_line_count++] = _strip_prefix(line, 2);
+return;
+}
+_flush_callout();
+if (line == ">") return;
 }
 
-std::string TermWriter::_trim(const std::string& s) const
+/* inside a table? */
+if (_in_table)
 {
-	std::size_t start = 0;
-	while (start < s.size() && (s[start] == ' ' || s[start] == '\t'))
-		++start;
-	std::size_t end = s.size();
-	while (end > start && (s[end - 1] == ' ' || s[end - 1] == '\t'))
-		--end;
-	return s.substr(start, end - start);
+if (_is_table_line(line))
+{
+if (_is_sep_line(line))
+{
+_table_has_header = true;
+}
+else
+{
+std::string cells[8];
+int n = _split_pipe(line, cells, _pending_table ? 8 : 8);
+if (_pending_table)
+{
+if (!_table_has_header)
+{
+std::string h[8]; for (int i = 0; i < n; ++i) h[i] = cells[i];
+_pending_table->header(h, n);
+}
+else
+{
+std::string r[8]; for (int i = 0; i < n; ++i) r[i] = cells[i];
+_pending_table->row(r, n);
+}
+}
+}
+return;
+}
+_flush_table();
+}
+
+/* table start: | ... | */
+if (_is_table_line(line) && !_is_sep_line(line))
+{
+std::string cells[8];
+int n = _split_pipe(line, cells, 8);
+if (n > 0)
+{
+delete _pending_table;
+_pending_table = new Table(n);
+_pending_table->set_style(_table_style);
+_in_table = true;
+_table_has_header = false;
+std::string h[8]; for (int i = 0; i < n; ++i) h[i] = cells[i];
+_pending_table->header(h, n);
+return;
+}
+}
+
+/* blank line */
+if (line.empty()) { nl(); return; }
+
+/* separator: --- */
+if (line.size() >= 3 && _is_repeated(line, '-')) { sep(); return; }
+
+/* heavy rule: === */
+if (line.size() >= 3 && _is_repeated(line, '=')) { hr(); return; }
+
+/* headings: # ## ### */
+if (_starts_with(line, "### ")) { h3(_strip_prefix(line, 4)); return; }
+if (_starts_with(line, "## "))  { h2(_strip_prefix(line, 3)); return; }
+if (_starts_with(line, "# "))   { h1(_strip_prefix(line, 2)); return; }
+
+/* callout open: >![type] label */
+if (_starts_with(line, ">!["))
+{
+std::size_t close = line.find(']', 3);
+if (close != std::string::npos)
+{
+_in_callout = true;
+_callout_type = line.substr(3, close - 3);
+_callout_label = _strip_prefix(line, close + 1);
+if (_callout_label.empty()) _callout_label = _callout_type;
+_callout_line_count = 0;
+for (int i = 0; i < 10; ++i) _callout_lines[i] = "";
+return;
+}
+}
+
+/* blockquote: > text */
+if (_starts_with(line, "> ")) { quote(_strip_prefix(line, 2)); return; }
+
+/* log levels: !i !w !x !v !d !t !! */
+if (line.size() >= 3 && line[0] == '!')
+{
+char c = line[1];
+if (c == 'i' && line[2] == ' ') { info(_strip_prefix(line, 3));    return; }
+if (c == 'w' && line[2] == ' ') { warn(_strip_prefix(line, 3));    return; }
+if (c == '!' && line[2] == ' ') { warn(_strip_prefix(line, 3));    return; }
+if (c == 'x' && line[2] == ' ') { error(_strip_prefix(line, 3));   return; }
+if (c == 'v' && line[2] == ' ') { success(_strip_prefix(line, 3)); return; }
+if (c == 'd' && line[2] == ' ') { danger(_strip_prefix(line, 3));  return; }
+if (c == 't' && line[2] == ' ') { trace(_strip_prefix(line, 3));   return; }
+}
+
+/* log levels: [info] [warn] [error] [success] [danger] [trace] */
+if (_starts_with(line, "[info] "))    { info(_strip_prefix(line, 7));    return; }
+if (_starts_with(line, "[warn] "))    { warn(_strip_prefix(line, 7));    return; }
+if (_starts_with(line, "[error] "))   { error(_strip_prefix(line, 8));   return; }
+if (_starts_with(line, "[success] ")) { success(_strip_prefix(line, 10));return; }
+if (_starts_with(line, "[danger] "))  { danger(_strip_prefix(line, 9));  return; }
+if (_starts_with(line, "[trace] "))   { trace(_strip_prefix(line, 8));   return; }
+
+/* callout: [!name] body */
+if (_starts_with(line, "[!") && line.find(']') != std::string::npos)
+{
+std::size_t end = line.find(']');
+std::string name = line.substr(2, end - 2);
+std::string body = _strip_prefix(line, end + 1);
+const ElemStyle* custom = get_callout(name);
+if (custom)
+{
+_emit(TermUtils::apply_fg(custom->fg)
++ TermUtils::apply_font(custom->font)
++ custom->glyph + body + TermUtils::reset());
+}
+else
+{
+_emit(TermUtils::apply_fg(_ts->callout_style.fg)
++ _ts->callout_style.glyph + body + TermUtils::reset());
+}
+return;
+}
+
+/* unordered list: - item */
+if (_starts_with(line, "- ")) { bullet(_strip_prefix(line, 2)); return; }
+
+/* ordered list: N. item */
+{
+int num = 0;
+std::string rest;
+if (_is_ordered(line, num, rest)) { ordered(num, rest); return; }
+}
+
+/* section: $$ title / body */
+if (_starts_with(line, "$$ "))
+{
+std::string content = _strip_prefix(line, 3);
+std::size_t slash = content.find('/');
+if (slash != std::string::npos)
+{
+std::string stitle = content.substr(0, slash);
+std::string sbody  = _strip_prefix(content, slash + 1);
+while (!stitle.empty() && stitle[stitle.size()-1] == ' ')
+stitle.erase(stitle.size()-1);
+section(stitle, sbody);
+}
+else
+section(content, "");
+return;
+}
+
+/* **bold** */
+if (_starts_with(line, "**") && line.size() > 4
+&& line[line.size()-1] == '*' && line[line.size()-2] == '*')
+{
+bold(line.substr(2, line.size() - 4));
+return;
+}
+
+/* *italic* */
+if (line[0] == '*' && line.size() > 2
+&& line[line.size()-1] == '*' && line[1] != '*')
+{
+italic(line.substr(1, line.size() - 2));
+return;
+}
+
+/* ~~strike~~ */
+if (_starts_with(line, "~~") && line.size() > 4
+&& line[line.size()-1] == '~' && line[line.size()-2] == '~')
+{
+strike(line.substr(2, line.size() - 4));
+return;
+}
+
+/* ~dim~ */
+if (line[0] == '~' && line.size() > 2
+&& line[line.size()-1] == '~' && line[1] != '~')
+{
+dim(line.substr(1, line.size() - 2));
+return;
+}
+
+/* default: plain text */
+text(line);
+}
+
+/* -- flush callout ---------------------------------------------------- */
+void TermWriter::_flush_callout()
+{
+if (!_in_callout) return;
+const ElemStyle* custom = get_callout(_callout_type);
+const ElemStyle& es = custom ? *custom : _ts->callout_style;
+_emit(_render_callout(es, _callout_label, _callout_lines, _callout_line_count));
+_in_callout = false;
+_callout_type = "";
+_callout_label = "";
+_callout_line_count = 0;
+for (int i = 0; i < 10; ++i) _callout_lines[i] = "";
+}
+
+/* -- flush table ------------------------------------------------------ */
+void TermWriter::_flush_table()
+{
+if (!_in_table || !_pending_table) return;
+table(*_pending_table);
+delete _pending_table;
+_pending_table = 0;
+_in_table = false;
+_table_has_header = false;
 }
 
 } /* namespace libcpp */

@@ -55,6 +55,7 @@ clean:
 
 fclean: clean
 	@rm -f $(NAME) $(FTNAME) $(TEST_BIN) $(DEMO_BIN)
+	@rm -rf build/bin/studio
 
 re: fclean all
 
@@ -76,6 +77,29 @@ demo: $(NAME)
 	@$(CXX) $(CXXFLAGS) -I. $(DEMO_SRC) -L. -lcpp -o $(DEMO_BIN)
 	@./$(DEMO_BIN)
 
+# ── compile_studio ───────────────────────────────────────────────────────────
+#  Compiles every .cpp in studio/ unitarily:
+#    - studio/demo/*.cpp   → build/bin/studio/demo/<name>   (each standalone)
+#    - studio/tests/*.cpp  → build/bin/studio/tests/test_runner (linked together)
+
+STUDIO_DEMO_SRC   = $(wildcard studio/demo/*.cpp)
+STUDIO_DEMO_BIN   = $(patsubst studio/demo/%.cpp,build/bin/studio/demo/%,$(STUDIO_DEMO_SRC))
+STUDIO_TEST_SRC   = $(wildcard studio/tests/*.cpp)
+STUDIO_TEST_BIN   = build/bin/studio/tests/test_runner
+
+compile_studio: $(NAME) $(STUDIO_DEMO_BIN) $(STUDIO_TEST_BIN)
+	@printf "  $(GREEN)●$(RESET) $(BOLD)compile_studio$(RESET) $(DIM)done$(RESET)\n"
+
+build/bin/studio/demo/%: studio/demo/%.cpp $(NAME)
+	@mkdir -p $(dir $@)
+	@printf "  $(DIM)studio/demo$(RESET)  $(CYAN)%-30s$(RESET)\n" "$(notdir $<)"
+	@$(CXX) $(CXXFLAGS) $< -L. -lcpp -o $@
+
+$(STUDIO_TEST_BIN): $(STUDIO_TEST_SRC) $(NAME)
+	@mkdir -p $(dir $@)
+	@printf "  $(DIM)studio/tests$(RESET) $(CYAN)%-30s$(RESET)\n" "test_runner"
+	@$(CXX) $(CXXFLAGS) $(STUDIO_TEST_SRC) -L. -lcpp -o $@
+
 # ── Stats ────────────────────────────────────────────────────────────────────
 
 stats:
@@ -85,4 +109,4 @@ stats:
 	@printf "  $(BOLD)test files  $(RESET) $(YELLOW)%s$(RESET)\n" "$$(find tests -name '*.cpp' | wc -l)"
 	@printf "  $(BOLD)total lines $(RESET) $(YELLOW)%s$(RESET)\n" "$$(find include src tests -name '*.hpp' -o -name '*.cpp' | xargs wc -l | tail -1 | awk '{print $$1}')"
 
-.PHONY: all clean fclean re test demo stats
+.PHONY: all clean fclean re test demo stats compile_studio
