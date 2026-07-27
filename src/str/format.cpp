@@ -12,6 +12,9 @@
 
 #include "libcpp/str/format.hpp"
 #include <cctype>
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
 
 namespace libcpp {
 namespace str {
@@ -156,16 +159,49 @@ std::string join(const std::string* arr, int count, const std::string& sep) {
 }
 
 int split(const std::string& s, char delim, std::string* out, int max) {
+  if (max <= 0) return 0;
+
   int count = 0;
   std::string::size_type start = 0;
   std::string::size_type pos;
 
-  while (count < max && (pos = s.find(delim, start)) != std::string::npos) {
+  /* Stop one short of `max` so the final slot can absorb whatever is left.
+  ** Bounding the field COUNT must not silently bound the DATA: the old form
+  ** stopped at `max` and never wrote the remainder, so "a,b,c,d" with max 2
+  ** returned {"a","b"} and lost "c,d" without a word. */
+  while (count < max - 1 && (pos = s.find(delim, start)) != std::string::npos) {
     out[count++] = s.substr(start, pos - start);
     start = pos + 1;
   }
-  if (count < max) out[count++] = s.substr(start);
+  out[count++] = s.substr(start);
   return count;
+}
+
+std::vector<std::string> split(const std::string& s, char delim) {
+  std::vector<std::string> parts;
+  std::string::size_type start = 0;
+  std::string::size_type pos;
+
+  while ((pos = s.find(delim, start)) != std::string::npos) {
+    parts.push_back(s.substr(start, pos - start));
+    start = pos + 1;
+  }
+  parts.push_back(s.substr(start));
+  return parts;
+}
+
+std::vector<std::string> split_nonempty(const std::string& s, char delim) {
+  std::vector<std::string> parts;
+  std::string::size_type start = 0;
+
+  while (start <= s.size()) {
+    std::string::size_type pos = s.find(delim, start);
+    std::string::size_type end = (pos == std::string::npos) ? s.size() : pos;
+    if (end > start) parts.push_back(s.substr(start, end - start));
+    if (pos == std::string::npos) break;
+    start = pos + 1;
+  }
+  return parts;
 }
 
 bool starts_with(const std::string& s, const std::string& prefix) {
@@ -252,6 +288,68 @@ Message& Message::operator=(const Message& o) {
 Message::~Message() {}
 
 std::string Message::str() const { return _ss.str(); }
+
+/* ── Parsing ───────────────────────────────────────────────────────────── */
+
+/* Shape gate applied before strtol ever runs.  strtol itself is too
+** permissive for protocol input: it skips leading whitespace and accepts a
+** leading '+', so " 12" and "+12" would slip through an end-pointer check
+** alone. */
+static bool _all_digits(const std::string& s, bool allow_negative) {
+  std::string::size_type i = 0;
+  if (i < s.size() && s[i] == '-') {
+    if (!allow_negative) return false;
+    ++i;
+  }
+  if (i >= s.size()) return false; /* empty, or a lone '-' */
+  for (; i < s.size(); ++i) {
+    if (!std::isdigit(static_cast<unsigned char>(s[i]))) return false;
+  }
+  return true;
+}
+
+bool parse_long(const std::string& s, long lo, long hi, long& out) {
+  if (!_all_digits(s, true)) return false;
+
+  const int saved = errno; /* leave the caller's errno exactly as we found it */
+  errno = 0;
+  char* end = 0;
+  const long v = std::strtol(s.c_str(), &end, 10);
+  const int err = errno;
+  errno = saved;
+
+  if (err == ERANGE || end == s.c_str() || *end != '\0') return false;
+  if (v < lo || v > hi) return false;
+  out = v;
+  return true;
+}
+
+bool parse_long(const std::string& s, long& out) {
+  return parse_long(s, LONG_MIN, LONG_MAX, out);
+}
+
+bool parse_ulong(const std::string& s, unsigned long lo, unsigned long hi,
+                 unsigned long& out) {
+  /* No '-' allowed: strtoul would accept it and wrap, so "-1" becomes
+  ** ULONG_MAX instead of an error. */
+  if (!_all_digits(s, false)) return false;
+
+  const int saved = errno;
+  errno = 0;
+  char* end = 0;
+  const unsigned long v = std::strtoul(s.c_str(), &end, 10);
+  const int err = errno;
+  errno = saved;
+
+  if (err == ERANGE || end == s.c_str() || *end != '\0') return false;
+  if (v < lo || v > hi) return false;
+  out = v;
+  return true;
+}
+
+bool parse_ulong(const std::string& s, unsigned long& out) {
+  return parse_ulong(s, 0UL, ULONG_MAX, out);
+}
 
 } /* namespace str */
 } /* namespace libcpp */

@@ -162,6 +162,43 @@ bool eq_nocase(const std::string& a, const std::string& b) {
   return to_lower(a) == to_lower(b);
 }
 
+/* ── ASCII-only case operations ────────────────────────────────────────── */
+
+/* Deliberately not std::tolower: that one is locale-sensitive, and under a
+** Turkish locale it maps 'I' to a dotless i — which would quietly break the
+** very protocols these functions exist to serve. */
+static char _ascii_lower(char c) {
+  if (c >= 'A' && c <= 'Z') return static_cast<char>(c - 'A' + 'a');
+  return c;
+}
+
+static char _ascii_upper(char c) {
+  if (c >= 'a' && c <= 'z') return static_cast<char>(c - 'a' + 'A');
+  return c;
+}
+
+std::string ascii_to_lower(const std::string& s) {
+  std::string out(s);
+  for (std::string::size_type i = 0; i < out.size(); ++i)
+    out[i] = _ascii_lower(out[i]);
+  return out;
+}
+
+std::string ascii_to_upper(const std::string& s) {
+  std::string out(s);
+  for (std::string::size_type i = 0; i < out.size(); ++i)
+    out[i] = _ascii_upper(out[i]);
+  return out;
+}
+
+bool eq_ascii_nocase(const std::string& a, const std::string& b) {
+  if (a.size() != b.size()) return false;
+  for (std::string::size_type i = 0; i < a.size(); ++i) {
+    if (_ascii_lower(a[i]) != _ascii_lower(b[i])) return false;
+  }
+  return true;
+}
+
 /* ── Case style conversions ────────────────────────────────────────────── */
 
 static bool _is_sep(char c) {

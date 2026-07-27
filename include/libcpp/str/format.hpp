@@ -15,6 +15,7 @@
 
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace libcpp {
 namespace str {
@@ -58,7 +59,21 @@ std::string pad_left(const std::string& s, int width, char pad);
 std::string pad_right(const std::string& s, int width, char pad);
 std::string repeat(const std::string& s, int n);
 std::string join(const std::string* arr, int count, const std::string& sep);
+
+/* Fixed-array split.  Returns the number of fields written.  When the input
+** holds more fields than `max`, the LAST slot receives the whole unsplit
+** remainder: a bound may shorten the field list, but it never silently
+** discards input.  (It used to drop the tail with no indication at all.) */
 int split(const std::string& s, char delim, std::string* out, int max);
+
+/* Unbounded split — no array to size, no bound to guess.  n delimiters give
+** n + 1 fields, so "a,,b" yields 3 and "a," yields 2 (the last empty). */
+std::vector<std::string> split(const std::string& s, char delim);
+
+/* Same, with empty fields dropped — what a comma-separated protocol list
+** ("#a,,#b,") almost always means. */
+std::vector<std::string> split_nonempty(const std::string& s, char delim);
+
 bool starts_with(const std::string& s, const std::string& prefix);
 bool ends_with(const std::string& s, const std::string& suffix);
 std::string replace_all(const std::string& s, const std::string& from,
@@ -71,6 +86,26 @@ std::string truncate(const std::string& s, int max_len,
                      const std::string& suffix);
 bool is_empty(const std::string& s);
 bool is_blank(const std::string& s);
+
+/* ── Parsing — the inverse of to_string ────────────────────────────────── */
+/*
+** Strict and total: the WHOLE string must be a number.  These reject an
+** empty string, leading whitespace, a leading '+', a lone '-', embedded or
+** trailing garbage ("12abc"), and any value outside the requested range.
+** `out` is left untouched on failure, and errno is restored, so a caller
+** that is careful about errno (or forbidden from branching on it) can use
+** these freely.
+**
+** They exist because the raw strtol/strtoul idiom is easy to get subtly
+** wrong: it needs errno cleared beforehand, an end-pointer check AND a range
+** check to be correct — and strtoul in particular accepts "-1" happily,
+** wrapping it to ULONG_MAX instead of failing.
+*/
+bool parse_long(const std::string& s, long& out);
+bool parse_long(const std::string& s, long lo, long hi, long& out);
+bool parse_ulong(const std::string& s, unsigned long& out);
+bool parse_ulong(const std::string& s, unsigned long lo, unsigned long hi,
+                 unsigned long& out);
 
 /* ── Message — streamable string builder(replaces old message.hpp) ────── */
 
