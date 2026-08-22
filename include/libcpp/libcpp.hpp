@@ -19,17 +19,14 @@
 ** or include individual module headers for finer control.
 */
 
+#include "libcpp/config.hpp"
+
 /* ── core(design patterns + fundamentals) ─────────────────────────────── */
 #include "libcpp/core/arena.hpp"
-#include "libcpp/core/memento.hpp"
-#include "libcpp/core/observable_value.hpp"
-#include "libcpp/core/observer.hpp"
 #include "libcpp/core/option.hpp"
 #include "libcpp/core/property.hpp"
 #include "libcpp/core/result.hpp"
 #include "libcpp/core/signal.hpp"
-#include "libcpp/core/singleton.hpp"
-#include "libcpp/core/state_machine.hpp"
 #include "libcpp/core/types.hpp"
 
 /* ── term ──────────────────────────────────────────────────────────────── */
@@ -38,7 +35,6 @@
 #include "libcpp/term/style.hpp"
 #include "libcpp/term/stylesheet.hpp"
 #include "libcpp/term/table.hpp"
-#include "libcpp/term/thread_safe_iostream.hpp"
 #include "libcpp/term/tree.hpp"
 #include "libcpp/term/writer.hpp"
 
@@ -64,36 +60,60 @@
 /* ── str ───────────────────────────────────────────────────────────────── */
 #include "libcpp/str/case.hpp"
 #include "libcpp/str/format.hpp"
+#include "libcpp/str/secure.hpp"
 #include "libcpp/str/utf8.hpp"
 
 /* ── util ──────────────────────────────────────────────────────────────── */
 #include "libcpp/util/argparser.hpp"
-#include "libcpp/util/chronometer.hpp"
 #include "libcpp/util/config.hpp"
-#include "libcpp/util/timer.hpp"
 
 /* ── data ──────────────────────────────────────────────────────────────── */
 #include "libcpp/data/csv.hpp"
-#include "libcpp/data/data_buffer.hpp"
 #include "libcpp/data/database.hpp"
 #include "libcpp/data/date.hpp"
-#include "libcpp/data/pool.hpp"
+
+/* ────────────────────────────────────────────────────────────────────────
+** Modules that require C++11 or later.
+**
+** These headers use `= delete`, `= default`, default member initializers or
+** <thread>/<chrono>/<atomic>. A C++98 compiler cannot tokenize them, so they
+** are left out entirely rather than guarded from within -- see config.hpp.
+** Under -std=c++98 this umbrella therefore exposes the same modules that
+** libftpp98.a provides, and nothing that would fail to link against it.
+** ──────────────────────────────────────────────────────────────────────── */
+#if LIBCPP_HAS_CXX11
+
+/* ── core ──────────────────────────────────────────────────────────────── */
+# include "libcpp/core/memento.hpp"
+# include "libcpp/core/observable_value.hpp"
+# include "libcpp/core/observer.hpp"
+# include "libcpp/core/singleton.hpp"
+# include "libcpp/core/state_machine.hpp"
+
+/* ── term / util / data ────────────────────────────────────────────────── */
+# include "libcpp/term/thread_safe_iostream.hpp"
+# include "libcpp/util/chronometer.hpp"
+# include "libcpp/util/timer.hpp"
+# include "libcpp/data/data_buffer.hpp"
+# include "libcpp/data/pool.hpp"
 
 /* ── async ─────────────────────────────────────────────────────────────── */
-#include "libcpp/async/persistent_worker.hpp"
-#include "libcpp/async/thread.hpp"
-#include "libcpp/async/thread_safe_queue.hpp"
-#include "libcpp/async/worker_pool.hpp"
+# include "libcpp/async/persistent_worker.hpp"
+# include "libcpp/async/thread.hpp"
+# include "libcpp/async/thread_safe_queue.hpp"
+# include "libcpp/async/worker_pool.hpp"
 
 /* ── net ───────────────────────────────────────────────────────────────── */
-#include "libcpp/net/client.hpp"
-#include "libcpp/net/message.hpp"
-#include "libcpp/net/server.hpp"
+# include "libcpp/net/client.hpp"
+# include "libcpp/net/message.hpp"
+# include "libcpp/net/server.hpp"
 
 /* ── math ──────────────────────────────────────────────────────────────── */
-#include "libcpp/math/ivector2.hpp"
-#include "libcpp/math/ivector3.hpp"
-#include "libcpp/math/perlin_noise_2d.hpp"
-#include "libcpp/math/random_2d_coordinate_generator.hpp"
+# include "libcpp/math/ivector2.hpp"
+# include "libcpp/math/ivector3.hpp"
+# include "libcpp/math/perlin_noise_2d.hpp"
+# include "libcpp/math/random_2d_coordinate_generator.hpp"
+
+#endif /* LIBCPP_HAS_CXX11 */
 
 #endif /* LIBCPP_LIBCPP_HPP */
