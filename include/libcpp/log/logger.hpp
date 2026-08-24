@@ -18,7 +18,6 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "libcpp/term/color.hpp"
 
 namespace libcpp {
 namespace log {
@@ -35,7 +34,8 @@ enum Level {
 
 const char* level_name(Level lv);
 std::string level_string(Level lv);
-Srgb level_color(Level lv);
+/* Srgb level_color(Level) lives in log/level_color.hpp, so that logging
+** does not pull term/ into every consumer that includes this header. */
 
 /* ══════════════════════════════════════════════════════════════════════════
  *  ILogger — abstract logger interface

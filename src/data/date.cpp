@@ -403,5 +403,25 @@ bool is_weekend(const Date& d) {
 bool is_weekday(const Date& d) { return !is_weekend(d); }
 int quarter(const Date& d) { return (d.month() - 1) / 3 + 1; }
 
+/* ── Wall-clock formatting ──────────────────────────────────────────────── */
+
+std::string format_now(const char* fmt) {
+  if (fmt == 0 || *fmt == '\0') return std::string();
+  std::time_t now = std::time(NULL);
+  std::tm* lt = std::localtime(&now);
+  if (lt == 0) return std::string();
+  char buf[64];
+  std::size_t n = std::strftime(buf, sizeof(buf), fmt, lt);
+  if (n == 0) return std::string();
+  return std::string(buf, n);
+}
+
+std::string time_hms() {
+  std::string s = format_now("%H:%M:%S");
+  return s.empty() ? std::string("--:--:--") : s;
+}
+
+std::string timestamp_iso() { return format_now("%Y-%m-%dT%H:%M:%S"); }
+
 } /* namespace data */
 } /* namespace libcpp */

@@ -12,7 +12,8 @@
 
 #include "libcpp/log/logger.hpp"
 #include <cstring>
-#include <ctime>
+#include "libcpp/data/date.hpp"
+#include "libcpp/log/level_color.hpp"
 #include "libcpp/term/style.hpp"
 
 namespace libcpp {
@@ -58,12 +59,10 @@ Srgb level_color(Level lv) {
   return Srgb(255, 255, 255);
 }
 
-static std::string _timestamp() {
-  std::time_t now = std::time(0);
-  char buf[64];
-  std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", std::localtime(&now));
-  return std::string(buf);
-}
+/* Was a private strftime helper here; it was the fifth copy of that same
+** eight-line block across this project and ft_irc, and it shared their bug
+** of handing localtime()'s result to strftime() without a NULL check. */
+static std::string _timestamp() { return data::format_now("%Y-%m-%d %H:%M:%S"); }
 
 /* ── ILogger ───────────────────────────────────────────────────────────── */
 

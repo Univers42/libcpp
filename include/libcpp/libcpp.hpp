@@ -39,8 +39,10 @@
 #include "libcpp/term/writer.hpp"
 
 /* ── log ───────────────────────────────────────────────────────────────── */
+#include "libcpp/log/level_color.hpp"
 #include "libcpp/log/logger.hpp"
 #include "libcpp/log/macros.hpp"
+#include "libcpp/log/stream.hpp"
 
 /* ── test ──────────────────────────────────────────────────────────────── */
 #include "libcpp/test/fuzzer.hpp"
@@ -58,6 +60,7 @@
 #include "libcpp/mem/pool.hpp"
 
 /* ── str ───────────────────────────────────────────────────────────────── */
+#include "libcpp/str/base64.hpp"
 #include "libcpp/str/case.hpp"
 #include "libcpp/str/format.hpp"
 #include "libcpp/str/secure.hpp"

@@ -36,5 +36,27 @@ bool eq_consttime(const std::string& a, const std::string& b)
 	return acc == 0;
 }
 
+bool is_safe_path_component(const std::string& s)
+{
+	return is_safe_path_component(s, "");
+}
+
+bool is_safe_path_component(const std::string& s, const char* also_reject)
+{
+	if (s.empty() || s == "." || s == "..")
+		return false;
+	for (std::string::size_type i = 0; i < s.size(); ++i)
+	{
+		const unsigned char c = static_cast<unsigned char>(s[i]);
+		if (c < 0x20 || c == 0x7F || c == '/' || c == '\\')
+			return false;
+		if (also_reject != 0)
+			for (const char *p = also_reject; *p != '\0'; ++p)
+				if (s[i] == *p)
+					return false;
+	}
+	return true;
+}
+
 } /* namespace str */
 } /* namespace libcpp */

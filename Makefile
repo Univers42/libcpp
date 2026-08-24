@@ -52,11 +52,12 @@ SONAME = $(LIB_DIR)/libftpp.so
 #  under -std=c++98 -Wall -Wextra -Werror, not by reading the code. Re-run that
 #  check before moving a name between the two lists.
 
-#  Compile clean under C++98. (24 modules.)
+#  Compile clean under C++98. (25 modules.)
 SRC_C98_CORE = src/bench/benchmark.cpp src/bench/profiler.cpp \
                src/bench/timer.cpp src/data/csv.cpp src/data/database.cpp \
-               src/data/date.cpp src/log/logger.cpp src/str/case.cpp \
-               src/str/format.cpp src/str/secure.cpp src/str/utf8.cpp \
+               src/data/date.cpp src/log/logger.cpp src/str/base64.cpp \
+               src/str/case.cpp src/str/format.cpp src/str/secure.cpp \
+               src/str/utf8.cpp \
                src/term/color.cpp src/term/progress.cpp src/term/style.cpp \
                src/term/stylesheet.cpp src/term/table.cpp src/term/tree.cpp \
                src/term/writer.cpp src/test/fuzzer.cpp src/test/snapshot.cpp \
@@ -64,10 +65,15 @@ SRC_C98_CORE = src/bench/benchmark.cpp src/bench/profiler.cpp \
                src/util/config.cpp
 
 #  The dedicated C++98 tier — generic building blocks (line framing, streaming
-#  CSV, epoll registration, buffered sockets). Built only by STD=c++98; the
-#  C++17 profile leaves libftpp.a byte-for-byte as it was before STD existed.
+#  CSV, epoll registration, buffered sockets, per-descriptor I/O counters).
+#  Built only by STD=c++98; the C++17 profile leaves libftpp.a byte-for-byte
+#  as it was before STD existed.
+#
+#  expiring_registry.hpp is part of this tier too but is header-only (a class
+#  template), so it has no entry here.
 SRC_C98_TIER = c98/src/line_buffer.cpp c98/src/csv_writer.cpp \
-               c98/src/reactor.cpp c98/src/buffered_socket.cpp
+               c98/src/reactor.cpp c98/src/buffered_socket.cpp \
+               c98/src/traffic_stats.cpp
 
 #  Require C++11 or later. (16 modules.) All but one fail on C++11 syntax in
 #  their headers; src/mem/leak_guard.cpp is the odd one out — it fails C++98

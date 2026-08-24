@@ -129,6 +129,22 @@ bool is_weekend(const Date& d);
 bool is_weekday(const Date& d);
 int quarter(const Date& d);
 
+/* ── Wall-clock formatting ─────────────────────────────────────────────── */
+/*
+** strftime over localtime(time(NULL)).  These exist because "what time is it
+** right now, as a string" is the one thing Date cannot answer: Date carries
+** day resolution, and a log line or an audit row needs seconds.
+**
+** format_now returns an empty string when localtime fails or when fmt does
+** not fit in 63 bytes.  time_hms substitutes a same-width placeholder
+** instead, so a log column never changes width mid-stream; timestamp_iso
+** returns empty rather than inventing a plausible-looking time, because a
+** wrong timestamp in an audit trail is worse than a missing one.
+*/
+std::string format_now(const char* fmt);
+std::string time_hms();      /* "15:04:05"  ->  "--:--:--" on failure */
+std::string timestamp_iso(); /* "2026-08-24T15:04:05"  ->  "" on failure */
+
 } /* namespace data */
 } /* namespace libcpp */
 
